@@ -1,6 +1,6 @@
-package ch.ergonomics.demo.cards.impl;
+package ch.ergonomics.demo.cards;
 
-import ch.ergonomics.demo.cards.axon.*;
+import ch.ergonomics.demo.cards.api.*;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;

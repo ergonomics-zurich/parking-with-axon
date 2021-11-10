@@ -1,4 +1,4 @@
-package ch.ergonomics.demo.cards.axon;
+package ch.ergonomics.demo.cards.api;
 
 import lombok.Value;
 

@@ -1,10 +1,9 @@
-package ch.ergonomics.demo.cards.impl;
+package ch.ergonomics.demo.cards;
 
-import ch.ergonomics.demo.cards.axon.CardBalance;
-import ch.ergonomics.demo.cards.axon.CardBalanceUpdatedEvent;
-import ch.ergonomics.demo.cards.axon.CardIssuedEvent;
-import ch.ergonomics.demo.cards.axon.AllCardIdsQuery;
-import ch.ergonomics.demo.cards.axon.CardBalanceQuery;
+import ch.ergonomics.demo.cards.api.CardBalance;
+import ch.ergonomics.demo.cards.api.CardBalanceUpdatedEvent;
+import ch.ergonomics.demo.cards.api.AllCardIdsQuery;
+import ch.ergonomics.demo.cards.api.CardBalanceQuery;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
