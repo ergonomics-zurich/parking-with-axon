@@ -1,22 +1,22 @@
 package ch.ergonomics.demo.cards;
 
-import ch.ergonomics.demo.cards.api.CardBalance;
-import ch.ergonomics.demo.cards.api.CardBalanceUpdatedEvent;
 import ch.ergonomics.demo.cards.api.AllCardIdsQuery;
+import ch.ergonomics.demo.cards.api.CardBalance;
 import ch.ergonomics.demo.cards.api.CardBalanceQuery;
+import ch.ergonomics.demo.cards.api.CardBalanceUpdatedEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@Service
-public class CardDetailsService {
+@Component
+public class CardBalancesView {
 
     private final Map<String, Double> cards = new HashMap<>();
 
