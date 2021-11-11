@@ -13,7 +13,7 @@ when exiting the parking.
 ### Cards
 ```text
 GET /cards/{uid}
-GET /cards/{uid}/updates
+GET /cards/{uid}/updates (SSE)
 POST /cards/issue
 POST /cards/{uid}/credit/{amount}
 POST /cards/{uid}/debit/{amount}

@@ -26,7 +26,7 @@ public class CardsApi {
     @GetMapping("/cards")
     public Mono<List<String>> cards() {
         return reactorQueryGateway.query(
-                new AllCardIdsQuery(),
+                new CardIdsQuery("0", "f"),
                 ResponseTypes.multipleInstancesOf(String.class)
         );
     }

@@ -1,6 +1,5 @@
 package ch.ergonomics.demo.cards;
 
-import ch.ergonomics.demo.cards.api.AllCardIdsQuery;
 import ch.ergonomics.demo.cards.api.CardBalance;
 import ch.ergonomics.demo.cards.api.CardBalanceQuery;
 import ch.ergonomics.demo.cards.api.CardBalanceUpdatedEvent;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -22,11 +20,6 @@ public class CardBalancesView {
 
     @Autowired
     QueryUpdateEmitter queryUpdateEmitter;
-
-    @QueryHandler
-    public List<String> allCards(AllCardIdsQuery query) {
-        return List.copyOf(cards.keySet());
-    }
 
     @QueryHandler
     public CardBalance cardBalance(CardBalanceQuery query) {
