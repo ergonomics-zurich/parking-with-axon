@@ -23,11 +23,10 @@ then the entry or exit is confirmed once the car passes the barrier.
 
 ### Cards
 ```text
-GET /cards/{uid}                         return the balance of a parking card
+GET /cards                               list all existing card uids
 GET /cards/{uid}/updates (SSE)           listen to balance changes
 POST /cards/issue                        issue a new parking card
 POST /cards/{uid}/credit/{amount}        add amount to card balance
-POST /cards/{uid}/debit/{amount}         deduct amount from card balance
 ```
 
 ### Garages
@@ -42,6 +41,5 @@ POST /garages/{gid}/confirm-exit/{uid}   register that the vehicle has exited
 
 ### Backoffice
 ```text
-GET /backoffice/liability                return the total balance on cards
-GET /backoffice/open-tickets             list tickets that are currently in a garage
+GET /backoffice/open-tickets             list tickets that are currently in garages
 ```
