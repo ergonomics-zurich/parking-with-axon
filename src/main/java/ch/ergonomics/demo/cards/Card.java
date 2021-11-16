@@ -18,14 +18,10 @@ public class Card {
 
     @CommandHandler
     public Card(IssueCardCmd cmd) {
-        var rnd = new SecureRandom();
-        var sb = new StringBuilder();
-        while (sb.length() < 14) {
-            sb.append(Integer.toHexString(rnd.nextInt(16)));
-        }
+        var id = CardId.create();
         AggregateLifecycle
-            .apply(new CardIssuedEvent(sb.toString()))
-            .andThenApply(() -> new CardBalanceUpdatedEvent(sb.toString(), 0.0));
+            .apply(new CardIssuedEvent(id.toString()))
+            .andThenApply(() -> new CardBalanceUpdatedEvent(id.toString(), 0.0));
     }
 
     protected Card() {
@@ -59,6 +55,29 @@ public class Card {
     @EventSourcingHandler
     public void on(CardBalanceUpdatedEvent event) {
         this.balance = event.getBalance();
+    }
+
+    public static class CardId {
+
+        private final String id;
+
+        private CardId(final String id) {
+            this.id = id;
+        }
+
+        public static CardId create() {
+            var rnd = new SecureRandom();
+            var sb = new StringBuilder();
+            while (sb.length() < 14) {
+                sb.append(Integer.toHexString(rnd.nextInt(16)));
+            }
+            return new CardId(sb.toString());
+        }
+
+        @Override
+        public String toString() {
+            return id;
+        }
     }
 
 }
