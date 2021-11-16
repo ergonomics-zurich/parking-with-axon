@@ -3,7 +3,7 @@ package ch.ergonomics.demo.garages.api;
 import lombok.Value;
 
 @Value
-public class GarageUpdatedEvent {
+public class CapacityUpdatedEvent {
     String garageId;
     Integer capacity;
 }

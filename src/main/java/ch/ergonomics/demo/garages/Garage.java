@@ -9,7 +9,7 @@ import ch.ergonomics.demo.garages.api.EntryConfirmedEvent;
 import ch.ergonomics.demo.garages.api.ExitConfirmedEvent;
 import ch.ergonomics.demo.garages.api.ExitRequestedEvent;
 import ch.ergonomics.demo.garages.api.GarageRegisteredEvent;
-import ch.ergonomics.demo.garages.api.GarageUpdatedEvent;
+import ch.ergonomics.demo.garages.api.CapacityUpdatedEvent;
 import ch.ergonomics.demo.garages.api.RegisterGarageCmd;
 import ch.ergonomics.demo.garages.api.RequestEntryCmd;
 import ch.ergonomics.demo.garages.api.RequestExitCmd;
@@ -38,14 +38,13 @@ public class Garage {
         if (cmd.getCapacity() <= 0) {
             throw new IllegalArgumentException("capacity must be > 0");
         }
-        var id = "G" + (1_000_000 + new SecureRandom().nextInt(8_000_000));
-        AggregateLifecycle.apply(new GarageRegisteredEvent(id, cmd.getCapacity()));
+        AggregateLifecycle.apply(new GarageRegisteredEvent(GarageId.create().toString(), cmd.getCapacity()));
     }
 
     @CommandHandler
     public void handle(RequestEntryCmd cmd) {
         if (capacity <= 0) {
-            throw new IllegalStateException("no free slots available");
+            throw new IllegalArgumentException("no free slots available");
         }
         AggregateLifecycle.apply(new EntryAllowedEvent(cmd.getGarageId(), cmd.getCardId()));
     }
@@ -75,12 +74,15 @@ public class Garage {
 
     @CommandHandler
     public void handle(CapacityIncCmd cmd) {
-        AggregateLifecycle.apply(new GarageUpdatedEvent(cmd.getGarageId(), capacity + 1));
+        AggregateLifecycle.apply(new CapacityUpdatedEvent(cmd.getGarageId(), capacity + 1));
     }
 
     @CommandHandler
     public void handle(CapacityDecCmd cmd) {
-        AggregateLifecycle.apply(new GarageUpdatedEvent(cmd.getGarageId(), capacity - 1));
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("no free slots available");
+        }
+        AggregateLifecycle.apply(new CapacityUpdatedEvent(cmd.getGarageId(), capacity - 1));
     }
 
     @EventSourcingHandler
@@ -90,7 +92,7 @@ public class Garage {
     }
 
     @EventSourcingHandler
-    public void on(GarageUpdatedEvent event) {
+    public void on(CapacityUpdatedEvent event) {
         capacity = event.getCapacity();
     }
 
@@ -107,5 +109,22 @@ public class Garage {
                         .putString(cardId, StandardCharsets.UTF_8)
                         .hash()
                 );
+    }
+
+    public static class GarageId {
+        private final String id;
+
+        private GarageId(String id) {
+            this.id = id;
+        }
+
+        public static GarageId create() {
+            return new GarageId("G" + (1_000_000 + new SecureRandom().nextInt(8_000_000)));
+        }
+
+        @Override
+        public String toString() {
+            return id;
+        }
     }
 }

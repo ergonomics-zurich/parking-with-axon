@@ -1,6 +1,6 @@
 package ch.ergonomics.demo.garages;
 
-import ch.ergonomics.demo.garages.api.GarageUpdatedEvent;
+import ch.ergonomics.demo.garages.api.CapacityUpdatedEvent;
 import ch.ergonomics.demo.garages.api.GarageRegisteredEvent;
 import ch.ergonomics.demo.garages.api.MostFreeGaragesQuery;
 import lombok.EqualsAndHashCode;
@@ -29,7 +29,7 @@ public class MostFreeGaragesView {
     }
 
     @EventHandler
-    public void on(GarageUpdatedEvent event) {
+    public void on(CapacityUpdatedEvent event) {
         final GarageModel garage = new GarageModel(event.getGarageId(), event.getCapacity());
         capacitySortedIds.remove(garage);
         capacitySortedIds.add(garage);
