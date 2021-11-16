@@ -50,10 +50,4 @@ public class CardsApi {
         reactorCommandGateway.send(new CreditCmd(uid, amount));
     }
 
-    @PostMapping(path = "/cards/{uid}/debit/{amount}")
-    public void debit(@PathVariable String uid, @PathVariable double amount) {
-        reactorCommandGateway.send(new DebitCmd(uid, amount));
-    }
-
-
 }

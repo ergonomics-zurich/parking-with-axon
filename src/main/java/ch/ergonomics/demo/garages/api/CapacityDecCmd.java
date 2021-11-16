@@ -5,7 +5,7 @@ import lombok.Value;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @Value
-public class RequestExitCmd {
-    @Getter(onMethod_ = {@TargetAggregateIdentifier()}) String garageId;
-    String cardId;
+public class CapacityDecCmd {
+    @Getter(onMethod_ = {@TargetAggregateIdentifier()})
+    String garageId;
 }

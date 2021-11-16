@@ -5,9 +5,11 @@ import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
+import org.axonframework.spring.stereotype.Aggregate;
 
 import java.security.SecureRandom;
 
+@Aggregate
 public class Card {
     @AggregateIdentifier
     public String uid;
@@ -18,14 +20,15 @@ public class Card {
     public Card(IssueCardCmd cmd) {
         var rnd = new SecureRandom();
         var sb = new StringBuilder();
-        while (sb.length() < 14)
+        while (sb.length() < 14) {
             sb.append(Integer.toHexString(rnd.nextInt(16)));
+        }
         AggregateLifecycle
-                .apply(new CardIssuedEvent(sb.toString()))
-                .andThenApply(() -> new CardBalanceUpdatedEvent(sb.toString(), 0.0));
+            .apply(new CardIssuedEvent(sb.toString()))
+            .andThenApply(() -> new CardBalanceUpdatedEvent(sb.toString(), 0.0));
     }
 
-    public Card() {
+    protected Card() {
     }
 
     @CommandHandler
@@ -35,8 +38,7 @@ public class Card {
         if (this.balance + cmd.getCredit() > 500)
             throw new IllegalArgumentException("card may hold no more than 500");
 
-        AggregateLifecycle.apply(
-                new CardBalanceUpdatedEvent(this.uid, this.balance + cmd.getCredit()));
+        AggregateLifecycle.apply(new CardBalanceUpdatedEvent(this.uid, this.balance + cmd.getCredit()));
     }
 
     @CommandHandler
@@ -46,8 +48,7 @@ public class Card {
         if (this.balance - cmd.getDebit() < 0)
             throw new IllegalArgumentException("card may not go negative");
 
-        AggregateLifecycle.apply(
-                new CardBalanceUpdatedEvent(this.uid, this.balance - cmd.getDebit()));
+        AggregateLifecycle.apply(new CardBalanceUpdatedEvent(this.uid, this.balance - cmd.getDebit()));
     }
 
     @EventSourcingHandler

@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 @Component
 public class CardIdsView {
-    private SortedSet<String> ids = new TreeSet<>();
+    private final SortedSet<String> ids = new TreeSet<>();
 
     @QueryHandler
     public List<String> cardIds(CardIdsQuery query) {
