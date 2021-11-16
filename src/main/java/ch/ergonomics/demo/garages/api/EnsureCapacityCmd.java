@@ -8,4 +8,5 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 public class EnsureCapacityCmd {
     @Getter(onMethod_ = {@TargetAggregateIdentifier()})
     String gId;
+    String uId;
 }

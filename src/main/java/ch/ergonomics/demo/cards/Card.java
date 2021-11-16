@@ -54,8 +54,6 @@ public class Card {
     public void issueTicket(IssueTicketCmd cmd) {
         if (!tickets.containsKey(cmd.getGid())) {
             AggregateLifecycle.apply(new TicketIssuedEvent(cmd.getUid(), cmd.getGid(), cmd.getStart()));
-        } else {
-            AggregateLifecycle.apply(new TicketIssuedEvent(cmd.getUid(), cmd.getGid(), tickets.get(cmd.getGid()).getStart()));
         }
     }
 

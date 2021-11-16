@@ -3,6 +3,8 @@ package ch.ergonomics.demo.garages;
 import ch.ergonomics.demo.garages.api.CapacityUpdatedEvent;
 import ch.ergonomics.demo.garages.api.ConfirmEntryCmd;
 import ch.ergonomics.demo.garages.api.ConfirmExitCmd;
+import ch.ergonomics.demo.garages.api.EnsureCapacityCmd;
+import ch.ergonomics.demo.garages.api.EntryAllowedEvent;
 import ch.ergonomics.demo.garages.api.EntryConfirmedEvent;
 import ch.ergonomics.demo.garages.api.ExitConfirmedEvent;
 import ch.ergonomics.demo.garages.api.GarageRegisteredEvent;
@@ -33,10 +35,18 @@ public class Garage {
     }
 
     @CommandHandler
+    public void ensureFreeCapacity(EnsureCapacityCmd cmd) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("no empty slots");
+        }
+        AggregateLifecycle.apply(new EntryAllowedEvent(cmd.getGId(), cmd.getUId()));
+    }
+
+    @CommandHandler
     public void confirmEntry(ConfirmEntryCmd cmd) {
         AggregateLifecycle
             .apply(new CapacityUpdatedEvent(cmd.getGId(), capacity - 1))
-            .andThenApply(() -> new EntryConfirmedEvent(garageId, cmd.getUId() ));
+            .andThenApply(() -> new EntryConfirmedEvent(garageId, cmd.getUId()));
     }
 
     @CommandHandler

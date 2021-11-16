@@ -48,7 +48,7 @@ public class GaragesApi {
 
     @PostMapping(path = "/garages/{gid}/request-entry/{uid}")
     public void requestEntry(@PathVariable String gid, @PathVariable String uid) {
-        reactorCommandGateway.send(new EnsureCapacityCmd(gid));
+        reactorCommandGateway.send(new EnsureCapacityCmd(gid, uid));
     }
 
     @PostMapping(path = "/garages/{gid}/confirm-entry/{uid}")
