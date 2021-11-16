@@ -1,11 +1,11 @@
 package ch.ergonomics.demo.web;
 
-import ch.ergonomics.demo.garages.api.ConfirmEntryCmd;
-import ch.ergonomics.demo.garages.api.ConfirmExitCmd;
+import ch.ergonomics.demo.cards.api.InvalidateTicketCmd;
+import ch.ergonomics.demo.cards.api.IssueTicketCmd;
+import ch.ergonomics.demo.cards.api.PayTicketCmd;
 import ch.ergonomics.demo.garages.api.GarageIdsQuery;
 import ch.ergonomics.demo.garages.api.MostFreeGaragesQuery;
-import ch.ergonomics.demo.garages.api.RequestEntryCmd;
-import ch.ergonomics.demo.garages.api.RequestExitCmd;
+import ch.ergonomics.demo.garages.api.EnsureCapacityCmd;
 import org.axonframework.extensions.reactor.commandhandling.gateway.ReactorCommandGateway;
 import org.axonframework.extensions.reactor.queryhandling.gateway.ReactorQueryGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -47,22 +48,22 @@ public class GaragesApi {
 
     @PostMapping(path = "/garages/{gid}/request-entry/{uid}")
     public void requestEntry(@PathVariable String gid, @PathVariable String uid) {
-        reactorCommandGateway.send(new RequestEntryCmd(gid, uid));
+        reactorCommandGateway.send(new EnsureCapacityCmd(gid));
     }
 
     @PostMapping(path = "/garages/{gid}/confirm-entry/{uid}")
     public void confirmEntry(@PathVariable String gid, @PathVariable String uid) {
-        reactorCommandGateway.send(new ConfirmEntryCmd(gid, uid));
+        reactorCommandGateway.send(new IssueTicketCmd(uid, gid, Instant.now()));
     }
 
     @PostMapping(path = "/garages/{gid}/request-exit/{uid}")
     public void requestExit(@PathVariable String gid, @PathVariable String uid) {
-        reactorCommandGateway.send(new RequestExitCmd(gid, uid));
+        reactorCommandGateway.send(new PayTicketCmd(uid, gid, Instant.now()));
     }
 
     @PostMapping(path = "/garages/{gid}/confirm-exit/{uid}")
     public void confirmExit(@PathVariable String gid, @PathVariable String uid) {
-        reactorCommandGateway.send(new ConfirmExitCmd(gid, uid));
+        reactorCommandGateway.send(new InvalidateTicketCmd(uid, gid));
     }
 
 }

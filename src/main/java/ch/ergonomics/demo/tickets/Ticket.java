@@ -1,4 +1,4 @@
-package ch.ergonomics.demo.cards;
+package ch.ergonomics.demo.tickets;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,7 +6,9 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
-import java.util.UUID;
+
+import static com.google.common.hash.Hashing.sha256;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Data
 @AllArgsConstructor
@@ -17,8 +19,8 @@ public class Ticket {
     @EqualsAndHashCode.Exclude double amountPaid = 0.0;
     @EqualsAndHashCode.Exclude Instant stop = null;
 
-    public static Ticket create(Instant start) {
-        return new Ticket(TicketId.create().toString(), start);
+    public static Ticket create(String gId, String uId, Instant start) {
+        return new Ticket(TicketId.create(gId, uId, start.getEpochSecond()).toString(), start);
     }
 
     static class TicketId {
@@ -28,8 +30,9 @@ public class Ticket {
             this.id = id;
         }
 
-        public static TicketId create() {
-            return new TicketId(UUID.randomUUID().toString());
+        @SuppressWarnings("UnstableApiUsage")
+        public static TicketId create(String gId, String uId, Long ts) {
+            return new TicketId(String.format("T%s", sha256().newHasher().putString(gId, UTF_8).putString(uId, UTF_8).putLong(ts).hash()));
         }
 
         @Override

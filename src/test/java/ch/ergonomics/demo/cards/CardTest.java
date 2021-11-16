@@ -3,12 +3,18 @@ package ch.ergonomics.demo.cards;
 import ch.ergonomics.demo.cards.api.CardBalanceUpdatedEvent;
 import ch.ergonomics.demo.cards.api.CardIssuedEvent;
 import ch.ergonomics.demo.cards.api.CreditCmd;
-import ch.ergonomics.demo.cards.api.DebitCmd;
 import ch.ergonomics.demo.cards.api.IssueCardCmd;
+import ch.ergonomics.demo.cards.api.IssueTicketCmd;
+import ch.ergonomics.demo.cards.api.PayTicketCmd;
+import ch.ergonomics.demo.cards.api.TicketIssuedEvent;
+import ch.ergonomics.demo.cards.api.TicketPaidEvent;
+import ch.ergonomics.demo.garages.Garage;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.axonframework.test.matchers.Matchers;
 import org.junit.jupiter.api.*;
+
+import java.time.Instant;
 
 import static org.axonframework.test.matchers.Matchers.*;
 
@@ -53,37 +59,94 @@ class CardTest {
     }
 
     @Test
-    void testCardDebit() {
-        var id = Card.CardId.create().toString();
+    void testIssueTicketsWorks() {
+        var uId = Card.CardId.create().toString();
+        var gId = Garage.GarageId.create().toString();
+        var start = Instant.now();
         fixture
-            .given(new CardIssuedEvent(id), new CardBalanceUpdatedEvent(id, 0.0))
-            .andGivenCommands(new CreditCmd(id, 10))
-            .when(new DebitCmd(id, 5))
+            .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 10.0))
+            .when(new IssueTicketCmd(uId, gId, start))
             .expectSuccessfulHandlerExecution()
             .expectEventsMatching(
                 exactSequenceOf(
-                    messageWithPayload(Matchers.<CardBalanceUpdatedEvent>predicate(e -> e.getBalance() == 5)),
+                    messageWithPayload(
+                        Matchers.<TicketIssuedEvent>predicate(e -> e.getStart() == start && e.getGid().equals(gId) && e.getUid().equals(uId))
+                    )
+                )
+            );
+    }
+
+    @Test
+    void testIssueTicketsMoreThanOnceWorksAndReturnSameTicket() {
+        var uId = Card.CardId.create().toString();
+        var gId = Garage.GarageId.create().toString();
+        var start = Instant.now();
+        fixture
+            .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 10.0))
+            .andGivenCommands(new IssueTicketCmd(uId, gId, start))
+            .when(new IssueTicketCmd(uId, gId, start.plusSeconds(100)))
+            .expectSuccessfulHandlerExecution()
+            .expectEventsMatching(
+                exactSequenceOf(
+                    messageWithPayload(
+                        Matchers.<TicketIssuedEvent>predicate(e -> e.getStart() == start && e.getGid().equals(gId) && e.getUid().equals(uId))
+                    ),
                     andNoMore()
                 )
             );
     }
 
     @Test
-    void testCardDebitFailsWithBalanceLessThanAmount() {
-        var id = Card.CardId.create().toString();
+    void testPayTicketsWorks() {
+        var uId = Card.CardId.create().toString();
+        var gId = Garage.GarageId.create().toString();
+        var start = Instant.now();
+        var stop = start.plusSeconds(3600);
         fixture
-            .given(new CardIssuedEvent(id), new CardBalanceUpdatedEvent(id, 0.0))
-            .when(new DebitCmd(id, 10))
+            .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 10.0))
+            .andGivenCommands(new IssueTicketCmd(uId, gId, start))
+            .when(new PayTicketCmd(uId, gId, stop))
+            .expectSuccessfulHandlerExecution()
+            .expectEventsMatching(
+                exactSequenceOf(
+                    messageWithPayload(Matchers.<TicketPaidEvent>predicate(e -> e.getStop() == stop && (int) e.getPrice() == 3)),
+                    messageWithPayload(Matchers.<CardBalanceUpdatedEvent>predicate(e -> (int) e.getBalance() == 7)),
+                    andNoMore()
+                )
+            );
+    }
+
+    @Test
+    void testPayTicketsWithNoEnoughCreditFails() {
+        var uId = Card.CardId.create().toString();
+        var gId = Garage.GarageId.create().toString();
+        var start = Instant.now();
+        var stop = start.plusSeconds(3600);
+        fixture
+            .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 1.0))
+            .andGivenCommands(new IssueTicketCmd(uId, gId, start))
+            .when(new PayTicketCmd(uId, gId, stop))
             .expectException(IllegalArgumentException.class);
     }
 
     @Test
-    void testCardDebitFailsWithZeroAmount() {
-        var id = Card.CardId.create().toString();
+    void testPayingTicketsMoreThanOnceWorksAndUpdatesStopTime() {
+        var uId = Card.CardId.create().toString();
+        var gId = Garage.GarageId.create().toString();
+        var start = Instant.now();
         fixture
-            .given(new CardIssuedEvent(id), new CardBalanceUpdatedEvent(id, 0.0))
-            .when(new DebitCmd(id, 0))
-            .expectException(IllegalArgumentException.class);
+            .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 10.0))
+            .andGivenCommands(new IssueTicketCmd(uId, gId, start))
+            .when(new IssueTicketCmd(uId, gId, start.plusSeconds(100)))
+            .expectSuccessfulHandlerExecution()
+            .expectEventsMatching(
+                exactSequenceOf(
+                    messageWithPayload(
+                        Matchers.<TicketIssuedEvent>predicate(e -> e.getStart() == start && e.getGid().equals(gId) && e.getUid().equals(uId))
+                    ),
+                    andNoMore()
+                )
+            );
     }
 
     @Test
@@ -100,7 +163,7 @@ class CardTest {
         var id = Card.CardId.create().toString();
         fixture
             .given(new CardIssuedEvent(id), new CardBalanceUpdatedEvent(id, 10.0))
-            .when(new DebitCmd(id, 0))
+            .when(new CreditCmd(id, 0))
             .expectException(IllegalArgumentException.class);
     }
 }

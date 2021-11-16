@@ -12,5 +12,4 @@ public class PayTicketCmd {
     String uid;
     String gid;
     Instant stop;
-    Double pricePerMinute;
 }

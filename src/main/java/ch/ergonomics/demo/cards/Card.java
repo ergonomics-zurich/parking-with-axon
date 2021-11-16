@@ -1,21 +1,26 @@
 package ch.ergonomics.demo.cards;
 
-import ch.ergonomics.demo.cards.api.*;
-import org.axonframework.commandhandling.CommandExecutionException;
+import ch.ergonomics.demo.cards.api.CardBalanceUpdatedEvent;
+import ch.ergonomics.demo.cards.api.CardIssuedEvent;
+import ch.ergonomics.demo.cards.api.CreditCmd;
+import ch.ergonomics.demo.cards.api.InvalidateTicketCmd;
+import ch.ergonomics.demo.cards.api.IssueCardCmd;
+import ch.ergonomics.demo.cards.api.IssueTicketCmd;
+import ch.ergonomics.demo.cards.api.PayTicketCmd;
+import ch.ergonomics.demo.cards.api.TicketInvalidatedEvent;
+import ch.ergonomics.demo.cards.api.TicketIssuedEvent;
+import ch.ergonomics.demo.cards.api.TicketPaidEvent;
+import ch.ergonomics.demo.tickets.Ticket;
 import org.axonframework.commandhandling.CommandHandler;
-import org.axonframework.commandhandling.distributed.CommandDispatchException;
-import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Aggregate
 public class Card {
@@ -23,8 +28,6 @@ public class Card {
     public String uid;
     private double balance = 0.0;
     private final Map<String, Ticket> tickets = new HashMap<>();
-
-    @Autowired private CommandGateway commandGateway;
 
     @CommandHandler
     public Card(IssueCardCmd cmd) {
@@ -48,19 +51,12 @@ public class Card {
     }
 
     @CommandHandler
-    public void debitCard(DebitCmd cmd) {
-        if (cmd.getDebit() <= 0) {
-            throw new IllegalArgumentException("debit must be > 0");
-        }
-        if (this.balance - cmd.getDebit() < 0) {
-            throw new IllegalArgumentException("card may not go negative");
-        }
-        AggregateLifecycle.apply(new CardBalanceUpdatedEvent(this.uid, this.balance - cmd.getDebit()));
-    }
-
-    @CommandHandler
     public void issueTicket(IssueTicketCmd cmd) {
-        AggregateLifecycle.apply(new TicketIssuedEvent(cmd.getGid(), cmd.getStart()));
+        if (!tickets.containsKey(cmd.getGid())) {
+            AggregateLifecycle.apply(new TicketIssuedEvent(cmd.getUid(), cmd.getGid(), cmd.getStart()));
+        } else {
+            AggregateLifecycle.apply(new TicketIssuedEvent(cmd.getUid(), cmd.getGid(), tickets.get(cmd.getGid()).getStart()));
+        }
     }
 
     @CommandHandler
@@ -70,30 +66,27 @@ public class Card {
         }
         var ticket = tickets.get(cmd.getGid());
         var duration = Duration.between(ticket.getStart(), cmd.getStop()).abs().toMinutes();
-        var price = duration * cmd.getPricePerMinute();
+        var price = duration * 0.05;
         if (price >= ticket.getAmountPaid()) {
-            var debit = price - ticket.getAmountPaid();
-            try {
-                Objects.requireNonNull(commandGateway.sendAndWait(new DebitCmd(cmd.getUid(), debit)));
-            } catch (NullPointerException | CommandExecutionException | CommandDispatchException ex) {
-                throw new IllegalArgumentException(
-                    String.format(
-                        "Debiting card %s with amount %s for ticket in garage %s failed - paid amount %s",
-                        cmd.getUid(),
-                        price,
-                        cmd.getGid(),
-                        ticket.getAmountPaid()
-                    ),
-                    ex
-                );
+            var toDebit = price - ticket.getAmountPaid();
+            if (toDebit <= 0) {
+                throw new IllegalArgumentException("price must be > 0");
             }
+            if (this.balance - toDebit < 0) {
+                throw new IllegalArgumentException("card may not go negative");
+            }
+            AggregateLifecycle
+                .apply(new TicketPaidEvent(cmd.getGid(), cmd.getStop(), price))
+                .andThenApply(() -> new CardBalanceUpdatedEvent(this.uid, this.balance - toDebit));
+        } else {
             AggregateLifecycle.apply(new TicketPaidEvent(cmd.getGid(), cmd.getStop(), price));
         }
+
     }
 
     @CommandHandler
     public void invalidateTicket(InvalidateTicketCmd cmd) {
-        AggregateLifecycle.apply(new TicketInvalidatedEvent(cmd.getGid()));
+        AggregateLifecycle.apply(new TicketInvalidatedEvent(cmd.getGid(), cmd.getUid()));
     }
 
     @EventSourcingHandler
@@ -108,7 +101,7 @@ public class Card {
 
     @EventSourcingHandler
     public void on(TicketIssuedEvent event) {
-        tickets.put(event.getGid(), Ticket.create(event.getStart()));
+        tickets.put(event.getGid(), Ticket.create(event.getGid(), event.getUid(), event.getStart()));
     }
 
     @EventSourcingHandler

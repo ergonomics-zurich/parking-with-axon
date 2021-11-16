@@ -5,8 +5,7 @@ import lombok.Value;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @Value
-public class RequestEntryCmd {
+public class EnsureCapacityCmd {
     @Getter(onMethod_ = {@TargetAggregateIdentifier()})
     String gId;
-    String uId;
 }

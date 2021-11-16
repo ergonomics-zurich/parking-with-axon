@@ -6,6 +6,7 @@ import java.time.Instant;
 
 @Value
 public class TicketIssuedEvent {
+    String uid;
     String gid;
     Instant start;
 }
