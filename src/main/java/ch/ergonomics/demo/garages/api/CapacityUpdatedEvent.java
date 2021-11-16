@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class CapacityUpdatedEvent {
-    String garageId;
+    String gId;
     Integer capacity;
 }

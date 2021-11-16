@@ -1,11 +1,5 @@
 package ch.ergonomics.demo.garages;
 
-import ch.ergonomics.demo.cards.Card;
-import ch.ergonomics.demo.garages.api.CapacityDecCmd;
-import ch.ergonomics.demo.garages.api.CapacityIncCmd;
-import ch.ergonomics.demo.garages.api.CapacityUpdatedEvent;
-import ch.ergonomics.demo.garages.api.ConfirmEntryCmd;
-import ch.ergonomics.demo.garages.api.EntryConfirmedEvent;
 import ch.ergonomics.demo.garages.api.GarageRegisteredEvent;
 import ch.ergonomics.demo.garages.api.RegisterGarageCmd;
 import org.axonframework.test.aggregate.AggregateTestFixture;
@@ -46,45 +40,6 @@ class GarageTest {
         fixture
             .given()
             .when(new RegisterGarageCmd(capacity))
-            .expectException(IllegalArgumentException.class);
-    }
-
-    @Test
-    void testDecreaseCapacity() {
-        var garageId = Garage.GarageId.create().toString();
-        fixture
-            .given(new GarageRegisteredEvent(garageId, 5))
-            .when(new CapacityDecCmd(garageId))
-            .expectSuccessfulHandlerExecution()
-            .expectEventsMatching(
-                exactSequenceOf(
-                    messageWithPayload(Matchers.<CapacityUpdatedEvent>predicate(e -> e.getGarageId().equals(garageId) && e.getCapacity() == 4)),
-                    andNoMore()
-                )
-            );
-    }
-
-    @Test
-    void testIncreaseCapacity() {
-        var garageId = Garage.GarageId.create().toString();
-        fixture
-            .given(new GarageRegisteredEvent(garageId, 5))
-            .when(new CapacityIncCmd(garageId))
-            .expectSuccessfulHandlerExecution()
-            .expectEventsMatching(
-                exactSequenceOf(
-                    messageWithPayload(Matchers.<CapacityUpdatedEvent>predicate(e -> e.getGarageId().equals(garageId) && e.getCapacity() == 6)),
-                    andNoMore()
-                )
-            );
-    }
-
-    @Test
-    void testDecreaseCapacityFailsIfNoFreeSpots() {
-        var garageId = Garage.GarageId.create().toString();
-        fixture
-            .given(new GarageRegisteredEvent(garageId, 0))
-            .when(new CapacityDecCmd(garageId))
             .expectException(IllegalArgumentException.class);
     }
 

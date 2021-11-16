@@ -6,9 +6,7 @@ import java.time.Instant;
 
 @Value
 public class EntryConfirmedEvent {
-    String ticketId;
-    String garageId;
-    String cardId;
-    Double ratePerMinute;
+    String gId;
+    String cId;
     Instant start;
 }

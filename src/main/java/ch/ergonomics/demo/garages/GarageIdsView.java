@@ -22,6 +22,6 @@ public class GarageIdsView {
 
     @EventHandler
     public void on(GarageRegisteredEvent event) {
-        ids.add(event.getGarageId());
+        ids.add(event.getGId());
     }
 }

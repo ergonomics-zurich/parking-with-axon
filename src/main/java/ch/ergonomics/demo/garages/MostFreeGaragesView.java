@@ -25,12 +25,12 @@ public class MostFreeGaragesView {
 
     @EventHandler
     public void on(GarageRegisteredEvent event) {
-        capacitySortedIds.add(new GarageModel(event.getGarageId(), event.getCapacity()));
+        capacitySortedIds.add(new GarageModel(event.getGId(), event.getCapacity()));
     }
 
     @EventHandler
     public void on(CapacityUpdatedEvent event) {
-        final GarageModel garage = new GarageModel(event.getGarageId(), event.getCapacity());
+        final GarageModel garage = new GarageModel(event.getGId(), event.getCapacity());
         capacitySortedIds.remove(garage);
         capacitySortedIds.add(garage);
     }

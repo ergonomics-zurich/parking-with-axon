@@ -1,11 +1,12 @@
-package ch.ergonomics.demo.garages.api;
+package ch.ergonomics.demo.cards.api;
 
 import lombok.Getter;
 import lombok.Value;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @Value
-public class CapacityDecCmd {
+public class InvalidateTicketCmd {
     @Getter(onMethod_ = {@TargetAggregateIdentifier()})
-    String garageId;
+    String uid;
+    String gid;
 }

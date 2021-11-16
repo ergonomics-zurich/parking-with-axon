@@ -1,12 +1,15 @@
-package ch.ergonomics.demo.garages.api;
+package ch.ergonomics.demo.cards.api;
 
 import lombok.Getter;
 import lombok.Value;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
+import java.time.Instant;
+
 @Value
-public class RequestEntryCmd {
+public class IssueTicketCmd {
     @Getter(onMethod_ = {@TargetAggregateIdentifier()})
-    String gId;
-    String uId;
+    String uid;
+    String gid;
+    Instant start;
 }

@@ -1,11 +1,16 @@
-package ch.ergonomics.demo.garages.api;
+package ch.ergonomics.demo.cards.api;
 
 import lombok.Getter;
 import lombok.Value;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
+import java.time.Instant;
+
 @Value
-public class CapacityIncCmd {
+public class PayTicketCmd {
     @Getter(onMethod_ = {@TargetAggregateIdentifier()})
-    String garageId;
+    String uid;
+    String gid;
+    Instant stop;
+    Double pricePerMinute;
 }

@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class EntryAllowedEvent {
-    String garageId;
-    String cardId;
+    String gId;
+    String uId;
 }
