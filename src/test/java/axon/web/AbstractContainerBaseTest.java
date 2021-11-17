@@ -14,7 +14,7 @@ abstract class AbstractContainerBaseTest {
         AXON_SERVER =
             new GenericContainer<>(DockerImageName.parse("axoniq/axonserver:latest"))
                 .withExposedPorts(8024, 8124)
-                .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(GarageApiTest.class)).withSeparateOutputStreams())
+                .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(WebApiTest.class)).withSeparateOutputStreams())
                 .waitingFor(Wait.forHttp("/v1/public/me").forPort(8024).forStatusCode(200));
         AXON_SERVER.start();
     }

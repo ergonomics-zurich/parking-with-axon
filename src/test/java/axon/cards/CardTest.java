@@ -5,6 +5,7 @@ import axon.cards.api.CardRechargedEvent;
 import axon.cards.api.CardIssuedEvent;
 import axon.cards.api.RechargeCardCmd;
 import axon.cards.command.Card;
+import axon.util.CardId;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.axonframework.test.matchers.Matchers;
@@ -30,16 +31,14 @@ class CardTest {
             .expectEventsMatching(
                 exactSequenceOf(
                     messageWithPayload(Matchers.<CardIssuedEvent>predicate(e -> e.getCardId() != null)),
-                    messageWithPayload(Matchers.<CardRechargedEvent>predicate(e -> e.getCardId() != null && e.getAmount() == 0.0)),
                     andNoMore()
                 )
-            )
-            .expectState(card -> Assertions.assertNotNull(card.cardId));
+            );
     }
 
     @Test
     void testCardCredit() {
-        var id = Card.CardId.create().toString();
+        var id = CardId.generate();
         fixture
             .given(new CardIssuedEvent(id), new CardRechargedEvent(id, 0.0))
             .when(new RechargeCardCmd(id, 10))
@@ -54,7 +53,7 @@ class CardTest {
 
     @Test
     void testCardCreditFailsWithMoreThan500() {
-        var id = Card.CardId.create().toString();
+        var id = CardId.generate();
         fixture
             .given(new CardIssuedEvent(id), new CardRechargedEvent(id, 1.0))
             .when(new RechargeCardCmd(id, 500))
@@ -63,7 +62,7 @@ class CardTest {
 
     @Test
     void testCardCreditFailsWithZeroAmount() {
-        var id = Card.CardId.create().toString();
+        var id = CardId.generate();
         fixture
             .given(new CardIssuedEvent(id), new CardRechargedEvent(id, 10.0))
             .when(new RechargeCardCmd(id, 0))
