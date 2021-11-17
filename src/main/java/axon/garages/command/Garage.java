@@ -30,7 +30,6 @@ public class Garage {
 
     @CommandHandler
     public Boolean handle(EnsureCapacityCmd cmd) {
-        System.out.println("Garage " + this.garageId + " capacity: " + this.capacity + " used: " + this.used);
         return used < capacity;
     }
 

@@ -24,8 +24,8 @@ then the entry or exit is confirmed once the car passes the barrier.
 ### Cards
 ```text
 GET /cards                               list all existing card uids
-GET /cards/{uid}/updates (SSE)           listen to balance changes
-POST /cards/issue                        issue a new parking card
+POST /cards                              issue a new parking card
+GET /cards/{uid}                         listen to balance changes (using SSE)
 POST /cards/{uid}/credit/{amount}        add amount to card balance
 ```
 
@@ -33,6 +33,11 @@ POST /cards/{uid}/credit/{amount}        add amount to card balance
 ```text
 GET /garages                             list all existing parking garages
 GET /garages/best                        return the most empty parking garage
+POST /garages[?capacity=1&used=0]        register a new garage
+```
+
+### Parking
+```text
 POST /garages/{gid}/request-entry/{uid}  check whether the entry barrier should be opened
 POST /garages/{gid}/confirm-entry/{uid}  register that the vehicle has entered
 POST /garages/{gid}/request-exit/{uid}   check whether the exit barrier should be opened
@@ -41,5 +46,5 @@ POST /garages/{gid}/confirm-exit/{uid}   register that the vehicle has exited
 
 ### Backoffice
 ```text
-GET /backoffice/open-tickets             list tickets that are currently in garages
+GET /backoffice/active-permits           list permits that are currently active in garages
 ```
