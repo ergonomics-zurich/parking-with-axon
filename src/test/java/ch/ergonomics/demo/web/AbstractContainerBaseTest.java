@@ -17,7 +17,6 @@ abstract class AbstractContainerBaseTest {
                 .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(GarageApiTest.class)).withSeparateOutputStreams())
                 .waitingFor(Wait.forHttp("/v1/public/me").forPort(8024).forStatusCode(200));
         AXON_SERVER.start();
-//        System.setProperty("axon.axonserver.servers", String.format("%s:%s", AXON_SERVER.getHost(), AXON_SERVER.getMappedPort(8124)));
     }
 
 }

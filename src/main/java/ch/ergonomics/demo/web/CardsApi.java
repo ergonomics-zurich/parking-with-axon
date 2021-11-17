@@ -46,8 +46,8 @@ public class CardsApi {
     }
 
     @PostMapping(path = "/cards/{uid}/credit/{amount}")
-    public void credit(@PathVariable String uid, @PathVariable double amount) {
-        reactorCommandGateway.send(new CreditCmd(uid, amount));
+    public Mono<Void> credit(@PathVariable String uid, @PathVariable double amount) {
+        return reactorCommandGateway.send(new CreditCmd(uid, amount));
     }
 
 }

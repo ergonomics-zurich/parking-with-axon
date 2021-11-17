@@ -56,8 +56,8 @@ public class GaragesApi {
     }
 
     @PostMapping(path = "/garages/{gid}/confirm-entry/{uid}")
-    public void confirmEntry(@PathVariable String gid, @PathVariable String uid) {
-        reactorCommandGateway.send(new IssueTicketCmd(uid, gid, Instant.now()));
+    public Mono<Void> confirmEntry(@PathVariable String gid, @PathVariable String uid) {
+        return reactorCommandGateway.send(new IssueTicketCmd(uid, gid, Instant.now()));
     }
 
     @PostMapping(path = "/garages/{gid}/request-exit/{uid}")
@@ -70,8 +70,8 @@ public class GaragesApi {
     }
 
     @PostMapping(path = "/garages/{gid}/confirm-exit/{uid}")
-    public void confirmExit(@PathVariable String gid, @PathVariable String uid) {
-        reactorCommandGateway.send(new InvalidateTicketCmd(uid, gid));
+    public Mono<Void> confirmExit(@PathVariable String gid, @PathVariable String uid) {
+        return reactorCommandGateway.send(new InvalidateTicketCmd(uid, gid));
     }
 
 }
