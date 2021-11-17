@@ -2,7 +2,8 @@
 
 A parking backend implemented using
 [Axon Framework](https://axoniq.io/product-overview/axon-framework)
-and [Axon Server](https://axoniq.io/product-overview/axon-server).
+and [Axon Server](https://axoniq.io/product-overview/axon-server)
+as part of [this meetup](https://www.meetup.com/Domain-Driven-Design-Switzerland/events/281690302/).
 
 The application currently covers functionality from three contexts:
 
@@ -79,3 +80,8 @@ curl -X POST http://localhost:8080/garages/{gid}/confirm-exit/{uid}
 # list permits that are currently active in garages
 GET /backoffice/active-permits
 ```
+
+### Generate Load
+
+There exists a [separate application](https://github.com/ergonomics-zurich/parking-with-axon-client)
+to generate parking traffic to observe the application in action.
