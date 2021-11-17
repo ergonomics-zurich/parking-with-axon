@@ -1,4 +1,4 @@
-package ch.ergonomics.demo.tickets;
+package axon.tickets;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

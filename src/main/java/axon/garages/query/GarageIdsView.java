@@ -1,7 +1,7 @@
-package ch.ergonomics.demo.garages;
+package axon.garages;
 
-import ch.ergonomics.demo.garages.api.GarageIdsQuery;
-import ch.ergonomics.demo.garages.api.GarageRegisteredEvent;
+import axon.garages.api.GarageIdsQuery;
+import axon.garages.api.GarageRegisteredEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;

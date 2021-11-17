@@ -1,8 +1,7 @@
-package ch.ergonomics.demo.garages;
+package axon.garages.query;
 
-import ch.ergonomics.demo.garages.api.CapacityUpdatedEvent;
-import ch.ergonomics.demo.garages.api.GarageRegisteredEvent;
-import ch.ergonomics.demo.garages.api.MostFreeGaragesQuery;
+import axon.garages.api.GarageRegisteredEvent;
+import axon.garages.api.BestGarageQuery;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.axonframework.eventhandling.EventHandler;
@@ -19,18 +18,18 @@ public class MostFreeGaragesView {
     private final TreeSet<GarageModel> capacitySortedIds = new TreeSet<>(GarageModel::compareTo);
 
     @QueryHandler
-    public List<String> mostFreeIds(MostFreeGaragesQuery query) {
+    public List<String> mostFreeIds(BestGarageQuery query) {
         return capacitySortedIds.stream().map(GarageModel::getId).collect(Collectors.toList());
     }
 
     @EventHandler
     public void on(GarageRegisteredEvent event) {
-        capacitySortedIds.add(new GarageModel(event.getGId(), event.getCapacity()));
+        capacitySortedIds.add(new GarageModel(event.getGid(), event.getCapacity()));
     }
 
     @EventHandler
     public void on(CapacityUpdatedEvent event) {
-        final GarageModel garage = new GarageModel(event.getGId(), event.getCapacity());
+        final GarageModel garage = new GarageModel(event.getGid(), event.getUsed());
         capacitySortedIds.remove(garage);
         capacitySortedIds.add(garage);
     }

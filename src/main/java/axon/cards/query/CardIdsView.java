@@ -1,7 +1,7 @@
-package ch.ergonomics.demo.cards;
+package axon.cards;
 
-import ch.ergonomics.demo.cards.api.CardIdsQuery;
-import ch.ergonomics.demo.cards.api.CardIssuedEvent;
+import axon.cards.api.CardIdsQuery;
+import axon.cards.api.CardIssuedEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;

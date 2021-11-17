@@ -1,9 +1,9 @@
-package ch.ergonomics.demo.tickets;
+package axon.tickets;
 
-import ch.ergonomics.demo.cards.api.TicketInvalidatedEvent;
-import ch.ergonomics.demo.cards.api.TicketIssuedEvent;
-import ch.ergonomics.demo.garages.api.ConfirmEntryCmd;
-import ch.ergonomics.demo.garages.api.ConfirmExitCmd;
+import axon.cards.api.TicketInvalidatedEvent;
+import axon.cards.api.TicketIssuedEvent;
+import axon.garages.api.ConfirmEntryCmd;
+import axon.garages.api.ConfirmExitCmd;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.stereotype.Component;

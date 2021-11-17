@@ -1,14 +1,14 @@
-package ch.ergonomics.demo.garages;
+package axon.garages;
 
-import ch.ergonomics.demo.garages.api.CapacityUpdatedEvent;
-import ch.ergonomics.demo.garages.api.ConfirmEntryCmd;
-import ch.ergonomics.demo.garages.api.ConfirmExitCmd;
-import ch.ergonomics.demo.garages.api.EnsureCapacityCmd;
-import ch.ergonomics.demo.garages.api.EntryAllowedEvent;
-import ch.ergonomics.demo.garages.api.EntryConfirmedEvent;
-import ch.ergonomics.demo.garages.api.ExitConfirmedEvent;
-import ch.ergonomics.demo.garages.api.GarageRegisteredEvent;
-import ch.ergonomics.demo.garages.api.RegisterGarageCmd;
+import axon.garages.api.CapacityUpdatedEvent;
+import axon.garages.api.ConfirmEntryCmd;
+import axon.garages.api.ConfirmExitCmd;
+import axon.garages.api.EnsureCapacityCmd;
+import axon.garages.api.EntryAllowedEvent;
+import axon.garages.api.EntryConfirmedEvent;
+import axon.garages.api.ExitConfirmedEvent;
+import axon.garages.api.GarageRegisteredEvent;
+import axon.garages.api.RegisterGarageCmd;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;

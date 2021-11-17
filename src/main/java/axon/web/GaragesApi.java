@@ -1,11 +1,11 @@
-package ch.ergonomics.demo.web;
+package axon.web;
 
-import ch.ergonomics.demo.cards.api.InvalidateTicketCmd;
-import ch.ergonomics.demo.cards.api.IssueTicketCmd;
-import ch.ergonomics.demo.cards.api.PayTicketCmd;
-import ch.ergonomics.demo.garages.api.GarageIdsQuery;
-import ch.ergonomics.demo.garages.api.MostFreeGaragesQuery;
-import ch.ergonomics.demo.garages.api.EnsureCapacityCmd;
+import axon.cards.api.InvalidateTicketCmd;
+import axon.cards.api.IssueTicketCmd;
+import axon.cards.api.PayTicketCmd;
+import axon.garages.api.GarageIdsQuery;
+import axon.garages.api.MostFreeGaragesQuery;
+import axon.garages.api.EnsureCapacityCmd;
 import org.axonframework.extensions.reactor.commandhandling.gateway.ReactorCommandGateway;
 import org.axonframework.extensions.reactor.queryhandling.gateway.ReactorQueryGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;

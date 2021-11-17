@@ -1,4 +1,4 @@
-package ch.ergonomics.demo.cards;
+package axon.cards;
 
 import org.springframework.stereotype.Component;
 

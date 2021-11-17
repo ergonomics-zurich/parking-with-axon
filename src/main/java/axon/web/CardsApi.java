@@ -1,6 +1,6 @@
-package ch.ergonomics.demo.web;
+package axon.web;
 
-import ch.ergonomics.demo.cards.api.*;
+import axon.cards.api.*;
 import org.axonframework.extensions.reactor.commandhandling.gateway.ReactorCommandGateway;
 import org.axonframework.extensions.reactor.queryhandling.gateway.ReactorQueryGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;

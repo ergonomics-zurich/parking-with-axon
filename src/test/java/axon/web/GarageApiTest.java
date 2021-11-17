@@ -1,7 +1,7 @@
-package ch.ergonomics.demo.web;
+package axon.web;
 
-import ch.ergonomics.demo.cards.api.IssueCardCmd;
-import ch.ergonomics.demo.garages.api.RegisterGarageCmd;
+import axon.cards.api.IssueCardCmd;
+import axon.garages.api.RegisterGarageCmd;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

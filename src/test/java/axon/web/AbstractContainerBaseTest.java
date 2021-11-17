@@ -1,4 +1,4 @@
-package ch.ergonomics.demo.web;
+package axon.web;
 
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;

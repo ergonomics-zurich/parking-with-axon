@@ -1,8 +1,8 @@
-package ch.ergonomics.demo.cards;
+package axon.cards;
 
-import ch.ergonomics.demo.cards.api.CardBalance;
-import ch.ergonomics.demo.cards.api.CardBalanceQuery;
-import ch.ergonomics.demo.cards.api.CardBalanceUpdatedEvent;
+import axon.cards.api.CardBalance;
+import axon.cards.api.CardBalanceQuery;
+import axon.cards.api.CardBalanceUpdatedEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
