@@ -37,6 +37,15 @@ The application currently covers functionality from three contexts:
 
 # Usage
 
+### Setup
+
+```shell
+# starting axon server locally
+docker run -e AXONIQ_AXONSERVER_DEVMODE_ENABLED=true -p 8024:8024 -p 8124:8124 --name axonserver -d axoniq/axonserver
+# running the application
+./gradlew run
+```
+
 ### Cards
 
 ```shell
