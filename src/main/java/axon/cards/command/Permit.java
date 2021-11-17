@@ -13,6 +13,6 @@ public class Permit {
     Instant issuedAt;
 
     public double calcPrice() {
-        return 0.005 * Duration.between(this.issuedAt, Instant.now()).toSeconds();
+        return 0.015 * Duration.between(this.issuedAt, Instant.now()).toSeconds();
     }
 }

@@ -96,6 +96,7 @@ public class Card {
     public void on(PaymentEvent event) {
         var amountPaid = this.partialPayments.getOrDefault(event.getPermitId(), 0.0) + event.getAmount();
         this.partialPayments.put(event.getPermitId(), amountPaid);
+        this.balance -= event.getAmount();
     }
 
     @EventSourcingHandler
