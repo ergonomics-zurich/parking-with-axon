@@ -1,11 +1,6 @@
 package axon.tickets;
 
-import axon.cards.api.CardIssuedEvent;
-import axon.cards.api.CardRechargedEvent;
-import axon.cards.api.IssuePermitCmd;
-import axon.cards.api.PayOutstandingCmd;
-import axon.cards.api.PaymentEvent;
-import axon.cards.api.PermitIssuedEvent;
+import axon.cards.api.*;
 import axon.cards.command.Card;
 import axon.cards.command.Permit;
 import axon.util.CardId;
@@ -14,7 +9,8 @@ import axon.util.PermitId;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.axonframework.test.matchers.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 

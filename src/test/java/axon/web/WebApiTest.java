@@ -21,17 +21,19 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WebApiTest extends AbstractContainerBaseTest {
 
-    @DynamicPropertySource
-    static void axonServerProperties(DynamicPropertyRegistry registry) {
-        registry.add("axon.axonserver.servers", () -> String.format("%s:%s", AXON_SERVER.getHost(), AXON_SERVER.getMappedPort(8124)));
-    }
-
-    @Autowired WebTestClient client;
-    @Autowired CommandGateway gateway;
-
+    @Autowired
+    WebTestClient client;
+    @Autowired
+    CommandGateway gateway;
     String garage;
     String card;
     double credit;
+
+    @DynamicPropertySource
+    static void axonServerProperties(DynamicPropertyRegistry registry) {
+        registry.add("axon.axonserver.servers",
+            () -> String.format("%s:%s", AXON_SERVER.getHost(), AXON_SERVER.getMappedPort(8124)));
+    }
 
     @Test
     @Order(1)
@@ -279,15 +281,15 @@ class WebApiTest extends AbstractContainerBaseTest {
             .pollDelay(5, TimeUnit.SECONDS)
             .atMost(10, TimeUnit.SECONDS)
             .untilAsserted(() ->
-               client
-                   .get()
-                   .uri("/cards", card)
-                   .exchange()
-                   .expectStatus()
-                   .isOk()
-                   .expectBody()
-                   .jsonPath("$[0].balance")
-                   .value(Matchers.lessThan(credit))
+                client
+                    .get()
+                    .uri("/cards", card)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$[0].balance")
+                    .value(Matchers.lessThan(credit))
             );
     }
 
@@ -323,16 +325,15 @@ class WebApiTest extends AbstractContainerBaseTest {
             .pollDelay(2, TimeUnit.SECONDS)
             .atMost(5, TimeUnit.SECONDS)
             .untilAsserted(() ->
-               client
-                   .get()
-                   .uri("/garages")
-                   .exchange()
-                   .expectStatus()
-                   .isOk()
-                   .expectBody()
-                   .jsonPath("$[0].used")
-                   .isEqualTo(0)
+                client
+                    .get()
+                    .uri("/garages")
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$[0].used")
+                    .isEqualTo(0)
             );
     }
-
 }

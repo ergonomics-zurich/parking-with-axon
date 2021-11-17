@@ -26,15 +26,15 @@ public class Card {
     protected Card() {
     }
 
+    @CommandHandler
+    public Card(IssueCardCmd cmd) {
+        AggregateLifecycle.apply(new CardIssuedEvent(CardId.generate()));
+    }
+
     private Optional<Permit> findByGarage(String garageId) {
         return this.permits.stream()
             .filter(permit -> permit.getGarageId().equals(garageId))
             .findFirst();
-    }
-
-    @CommandHandler
-    public Card(IssueCardCmd cmd) {
-        AggregateLifecycle.apply(new CardIssuedEvent(CardId.generate()));
     }
 
     @CommandHandler

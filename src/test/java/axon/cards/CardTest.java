@@ -1,15 +1,16 @@
 package axon.cards;
 
-import axon.cards.api.IssueCardCmd;
-import axon.cards.api.CardRechargedEvent;
 import axon.cards.api.CardIssuedEvent;
+import axon.cards.api.CardRechargedEvent;
+import axon.cards.api.IssueCardCmd;
 import axon.cards.api.RechargeCardCmd;
 import axon.cards.command.Card;
 import axon.util.CardId;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.axonframework.test.matchers.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.axonframework.test.matchers.Matchers.*;
 

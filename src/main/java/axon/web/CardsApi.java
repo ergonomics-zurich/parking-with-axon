@@ -4,7 +4,6 @@ import axon.cards.api.*;
 import org.axonframework.extensions.reactor.commandhandling.gateway.ReactorCommandGateway;
 import org.axonframework.extensions.reactor.queryhandling.gateway.ReactorQueryGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
-import org.axonframework.queryhandling.SubscriptionQueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,8 +26,8 @@ public class CardsApi {
     @GetMapping("/cards")
     public Mono<List<CardBalanceView>> cards() {
         return reactorQueryGateway.query(
-                new AllCardsQuery(),
-                ResponseTypes.multipleInstancesOf(CardBalanceView.class)
+            new AllCardsQuery(),
+            ResponseTypes.multipleInstancesOf(CardBalanceView.class)
         );
     }
 

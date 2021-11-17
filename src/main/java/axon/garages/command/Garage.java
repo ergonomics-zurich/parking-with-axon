@@ -25,7 +25,7 @@ public class Garage {
         if (cmd.getUsed() > cmd.getCapacity()) throw new IllegalArgumentException("used must be <= capacity");
 
         AggregateLifecycle.apply(
-            new GarageRegisteredEvent(GarageId.generate().toString(), cmd.getCapacity(), cmd.getUsed()));
+            new GarageRegisteredEvent(GarageId.generate(), cmd.getCapacity(), cmd.getUsed()));
     }
 
     @CommandHandler

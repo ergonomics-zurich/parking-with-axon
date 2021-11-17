@@ -7,7 +7,6 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 abstract class AbstractContainerBaseTest {
-
     static final GenericContainer<?> AXON_SERVER;
 
     static {
@@ -18,5 +17,4 @@ abstract class AbstractContainerBaseTest {
                 .waitingFor(Wait.forHttp("/v1/public/me").forPort(8024).forStatusCode(200));
         AXON_SERVER.start();
     }
-
 }
