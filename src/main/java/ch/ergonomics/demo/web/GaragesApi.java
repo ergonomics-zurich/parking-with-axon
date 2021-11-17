@@ -47,8 +47,12 @@ public class GaragesApi {
     }
 
     @PostMapping(path = "/garages/{gid}/request-entry/{uid}")
-    public void requestEntry(@PathVariable String gid, @PathVariable String uid) {
-        reactorCommandGateway.send(new EnsureCapacityCmd(gid, uid));
+    public Mono<Boolean> requestEntry(@PathVariable String gid, @PathVariable String uid) {
+        return
+            reactorCommandGateway
+                .send(new EnsureCapacityCmd(gid, uid))
+                .map(o -> true)
+                .onErrorReturn(false);
     }
 
     @PostMapping(path = "/garages/{gid}/confirm-entry/{uid}")
@@ -57,8 +61,12 @@ public class GaragesApi {
     }
 
     @PostMapping(path = "/garages/{gid}/request-exit/{uid}")
-    public void requestExit(@PathVariable String gid, @PathVariable String uid) {
-        reactorCommandGateway.send(new PayTicketCmd(uid, gid, Instant.now()));
+    public Mono<Boolean> requestExit(@PathVariable String gid, @PathVariable String uid) {
+        return
+            reactorCommandGateway
+                .send(new PayTicketCmd(uid, gid, Instant.now()))
+                .map(o -> true)
+                .onErrorReturn(false);
     }
 
     @PostMapping(path = "/garages/{gid}/confirm-exit/{uid}")
