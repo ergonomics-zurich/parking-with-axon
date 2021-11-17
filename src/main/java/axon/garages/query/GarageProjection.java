@@ -24,8 +24,8 @@ public class GarageProjection {
 
     @EventHandler
     public void on(GarageRegisteredEvent event) {
-        var garage = new GarageView(event.getGid(), event.getCapacity(), event.getUsed());
-        garageById.put(event.getGid(), garage);
+        var garage = new GarageView(event.getGarageId(), event.getCapacity(), event.getUsed());
+        garageById.put(event.getGarageId(), garage);
         garages.add(garage);
     }
 

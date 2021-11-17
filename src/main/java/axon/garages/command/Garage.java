@@ -45,7 +45,7 @@ public class Garage {
 
     @EventSourcingHandler
     public void on(GarageRegisteredEvent event) {
-        garageId = event.getGid();
+        garageId = event.getGarageId();
         capacity = event.getCapacity();
         used = event.getUsed();
     }
