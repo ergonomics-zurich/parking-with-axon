@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class GarageView implements Comparable<GarageView> {
-    String gid;
+    String garageId;
     Integer capacity;
     Integer used;
 
