@@ -1,50 +1,42 @@
 package axon.garages.query;
 
-import axon.garages.api.GarageRegisteredEvent;
-import axon.garages.api.BestGarageQuery;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
+import axon.garages.api.*;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Component
-public class MostFreeGaragesView {
-
-    private final TreeSet<GarageModel> capacitySortedIds = new TreeSet<>(GarageModel::compareTo);
+public class BestGarageProjection {
+    private final PriorityQueue<GarageView> garages = new PriorityQueue<>(GarageView::compareTo);
+    private final Map<String, GarageView> garageById = new HashMap<>();
 
     @QueryHandler
-    public List<String> mostFreeIds(BestGarageQuery query) {
-        return capacitySortedIds.stream().map(GarageModel::getId).collect(Collectors.toList());
+    public GarageView handle(BestGarageQuery query) {
+        return garages.peek();
     }
 
     @EventHandler
     public void on(GarageRegisteredEvent event) {
-        capacitySortedIds.add(new GarageModel(event.getGid(), event.getCapacity()));
+        var garage = new GarageView(event.getGid(), event.getCapacity(), event.getUsed());
+        garageById.put(event.getGid(), garage);
+        garages.add(garage);
     }
 
     @EventHandler
-    public void on(CapacityUpdatedEvent event) {
-        final GarageModel garage = new GarageModel(event.getGid(), event.getUsed());
-        capacitySortedIds.remove(garage);
-        capacitySortedIds.add(garage);
+    public void on(EntryConfirmedEvent event) {
+        var garage = garageById.get(event.getGid());
+        garages.remove(garage);
+        garage.setUsed(garage.getUsed() + 1);
+        garages.add(garage);
     }
 
-    @Value
-    private static class GarageModel implements Comparable<GarageModel> {
-
-        String id;
-
-        @EqualsAndHashCode.Exclude Integer capacity;
-
-        @Override
-        public int compareTo(final GarageModel other) {
-            return other.getCapacity().compareTo(this.getCapacity());
-
-        }
+    @EventHandler
+    public void on(ExitConfirmedEvent event) {
+        var garage = garageById.get(event.getGid());
+        garages.remove(garage);
+        garage.setUsed(garage.getUsed() - 1);
+        garages.add(garage);
     }
 }

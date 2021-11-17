@@ -1,4 +1,4 @@
-package axon.tickets;
+package axon.garages.command;
 
 import axon.cards.api.TicketInvalidatedEvent;
 import axon.cards.api.TicketIssuedEvent;

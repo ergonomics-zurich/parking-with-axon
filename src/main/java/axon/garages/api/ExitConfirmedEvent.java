@@ -1,8 +1,9 @@
-package ch.ergonomics.demo.garages.api;
+package axon.garages.api;
 
 import lombok.Value;
 
 @Value
 public class ExitConfirmedEvent {
-    String gId;
+    String gid;
+    String uid;
 }

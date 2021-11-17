@@ -1,4 +1,4 @@
-package axon.cards;
+package axon.cards.command;
 
 import axon.cards.api.CardBalanceUpdatedEvent;
 import axon.cards.api.CardIssuedEvent;
@@ -10,7 +10,6 @@ import axon.cards.api.PayTicketCmd;
 import axon.cards.api.TicketInvalidatedEvent;
 import axon.cards.api.TicketIssuedEvent;
 import axon.cards.api.TicketPaidEvent;
-import axon.tickets.Ticket;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;

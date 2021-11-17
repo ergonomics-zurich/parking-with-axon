@@ -6,7 +6,7 @@ plugins {
 group 'ch.ergonomics.demo'
 version '1.0-SNAPSHOT'
 sourceCompatibility = '11'
-mainClassName = 'ch.ergonomics.demo.Main'
+mainClassName = 'axon.Main'
 
 repositories {
     mavenCentral()

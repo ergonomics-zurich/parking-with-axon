@@ -1,9 +1,10 @@
-package ch.ergonomics.demo.cards;
+package axon.cards;
 
-import ch.ergonomics.demo.cards.api.CardBalanceUpdatedEvent;
-import ch.ergonomics.demo.cards.api.CardIssuedEvent;
-import ch.ergonomics.demo.cards.api.CreditCmd;
-import ch.ergonomics.demo.cards.api.IssueCardCmd;
+import axon.cards.api.IssueCardCmd;
+import axon.cards.api.CardBalanceUpdatedEvent;
+import axon.cards.api.CardIssuedEvent;
+import axon.cards.api.CreditCmd;
+import axon.cards.command.Card;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.axonframework.test.matchers.Matchers;

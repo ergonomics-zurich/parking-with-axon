@@ -1,4 +1,4 @@
-package axon.cards;
+package axon.cards.query;
 
 import axon.cards.api.CardBalance;
 import axon.cards.api.CardBalanceQuery;

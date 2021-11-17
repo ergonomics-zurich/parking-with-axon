@@ -1,4 +1,4 @@
-package axon.cards;
+package axon.cards.query;
 
 import axon.cards.api.CardIdsQuery;
 import axon.cards.api.CardIssuedEvent;

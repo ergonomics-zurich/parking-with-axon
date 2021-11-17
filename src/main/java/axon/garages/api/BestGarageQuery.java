@@ -3,4 +3,4 @@ package axon.garages.api;
 import lombok.Value;
 
 @Value
-public class MostFreeGaragesQuery { }
+public class BestGarageQuery { }

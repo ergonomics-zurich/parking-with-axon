@@ -3,16 +3,11 @@ package axon.web;
 import axon.cards.api.InvalidateTicketCmd;
 import axon.cards.api.IssueTicketCmd;
 import axon.cards.api.PayTicketCmd;
-import axon.garages.api.GarageIdsQuery;
-import axon.garages.api.MostFreeGaragesQuery;
-import axon.garages.api.EnsureCapacityCmd;
+import axon.garages.api.*;
 import org.axonframework.extensions.reactor.commandhandling.gateway.ReactorCommandGateway;
 import org.axonframework.extensions.reactor.queryhandling.gateway.ReactorQueryGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -33,26 +28,30 @@ public class GaragesApi {
     @GetMapping("/garages")
     public Mono<List<String>> garages() {
         return reactorQueryGateway.query(
-                new GarageIdsQuery(),
-                ResponseTypes.multipleInstancesOf(String.class)
+            new GarageIdsQuery(),
+            ResponseTypes.multipleInstancesOf(String.class)
+        );
+    }
+
+    @PostMapping("/garages")
+    public Mono<String> garages(@RequestParam(name = "capacity", defaultValue = "25") int capacity,
+                                @RequestParam(name = "used", defaultValue = "0") int used) {
+        return reactorCommandGateway.send(
+            new RegisterGarageCmd(capacity, used)
         );
     }
 
     @GetMapping(path = "/garages/best")
-    public Mono<List<String>> bestGarages() {
+    public Mono<GarageView> bestGarages() {
         return reactorQueryGateway.query(
-                new MostFreeGaragesQuery(),
-                ResponseTypes.multipleInstancesOf(String.class)
+            new BestGarageQuery(),
+            ResponseTypes.instanceOf(GarageView.class)
         );
     }
 
     @PostMapping(path = "/garages/{gid}/request-entry/{uid}")
     public Mono<Boolean> requestEntry(@PathVariable String gid, @PathVariable String uid) {
-        return
-            reactorCommandGateway
-                .send(new EnsureCapacityCmd(gid, uid))
-                .map(o -> true)
-                .onErrorReturn(false);
+        return reactorCommandGateway.send(new EnsureCapacityCmd(gid, uid));
     }
 
     @PostMapping(path = "/garages/{gid}/confirm-entry/{uid}")

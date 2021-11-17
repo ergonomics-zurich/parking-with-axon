@@ -1,9 +1,10 @@
-package ch.ergonomics.demo.garages.api;
+package axon.garages.api;
 
 import lombok.Value;
 
 @Value
 public class GarageRegisteredEvent {
-    String gId;
+    String gid;
     int capacity;
+    int used;
 }

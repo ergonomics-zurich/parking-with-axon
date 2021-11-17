@@ -31,6 +31,11 @@ public class CardsApi {
         );
     }
 
+    @PostMapping("/cards")
+    public Mono<String> issue() {
+        return reactorCommandGateway.send(new IssueCardCmd());
+    }
+
     @GetMapping(path = "/cards/{uid}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Mono<SubscriptionQueryResult<CardBalance, CardBalance>> cardBalance(@PathVariable String uid) {
         return reactorQueryGateway.subscriptionQuery(
@@ -38,11 +43,6 @@ public class CardsApi {
                 ResponseTypes.instanceOf(CardBalance.class),
                 ResponseTypes.instanceOf(CardBalance.class)
         );
-    }
-
-    @PostMapping("/cards/issue")
-    public Mono<String> issue() {
-        return reactorCommandGateway.send(new IssueCardCmd());
     }
 
     @PostMapping(path = "/cards/{uid}/credit/{amount}")

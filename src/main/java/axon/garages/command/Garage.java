@@ -1,86 +1,65 @@
-package axon.garages;
+package axon.garages.command;
 
-import axon.garages.api.CapacityUpdatedEvent;
-import axon.garages.api.ConfirmEntryCmd;
-import axon.garages.api.ConfirmExitCmd;
-import axon.garages.api.EnsureCapacityCmd;
-import axon.garages.api.EntryAllowedEvent;
-import axon.garages.api.EntryConfirmedEvent;
-import axon.garages.api.ExitConfirmedEvent;
-import axon.garages.api.GarageRegisteredEvent;
-import axon.garages.api.RegisterGarageCmd;
+import axon.garages.api.*;
+import axon.shared.GarageId;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
-import java.security.SecureRandom;
-
 @Aggregate
 public class Garage {
     @AggregateIdentifier
     private String garageId;
     private int capacity;
+    private int used;
 
     protected Garage() {
     }
 
     @CommandHandler
     public Garage(RegisterGarageCmd cmd) {
-        if (cmd.getCapacity() <= 0) {
-            throw new IllegalArgumentException("capacity must be > 0");
-        }
-        AggregateLifecycle.apply(new GarageRegisteredEvent(GarageId.create().toString(), cmd.getCapacity()));
+        if (cmd.getCapacity() < 0) throw new IllegalArgumentException("capacity must be >= 0");
+        if (cmd.getUsed() < 0) throw new IllegalArgumentException("used must be >= 0");
+        if (cmd.getUsed() > cmd.getCapacity()) throw new IllegalArgumentException("used must be <= capacity");
+
+        AggregateLifecycle.apply(
+            new GarageRegisteredEvent(GarageId.create().toString(), cmd.getCapacity(), cmd.getUsed()));
     }
 
     @CommandHandler
-    public void ensureFreeCapacity(EnsureCapacityCmd cmd) {
-        if (capacity <= 0) {
-            throw new IllegalArgumentException("no empty slots");
-        }
-        AggregateLifecycle.apply(new EntryAllowedEvent(cmd.getGId(), cmd.getUId()));
+    public Boolean handle(EnsureCapacityCmd cmd) {
+        System.out.println("Garage " + this.garageId + " capacity: " + this.capacity + " used: " + this.used);
+        return used < capacity;
     }
 
     @CommandHandler
-    public void confirmEntry(ConfirmEntryCmd cmd) {
+    public void handle(ConfirmEntryCmd cmd) {
         AggregateLifecycle
-            .apply(new CapacityUpdatedEvent(cmd.getGId(), capacity - 1))
-            .andThenApply(() -> new EntryConfirmedEvent(garageId, cmd.getUId()));
+            .apply(new EntryConfirmedEvent(garageId, cmd.getUid()));
     }
 
     @CommandHandler
-    public void confirmExit(ConfirmExitCmd cmd) {
+    public void handle(ConfirmExitCmd cmd) {
         AggregateLifecycle
-            .apply(new CapacityUpdatedEvent(cmd.getGId(), capacity + 1))
-            .andThenApply(() -> new ExitConfirmedEvent(garageId));
+            .apply(new ExitConfirmedEvent(garageId, cmd.getUid()));
     }
 
     @EventSourcingHandler
     public void on(GarageRegisteredEvent event) {
-        garageId = event.getGId();
+        garageId = event.getGid();
         capacity = event.getCapacity();
+        used = event.getUsed();
     }
 
     @EventSourcingHandler
-    public void on(CapacityUpdatedEvent event) {
-        capacity = event.getCapacity();
+    public void on(EntryConfirmedEvent event) {
+        used = used + 1;
     }
 
-    public static class GarageId {
-        private final String id;
-
-        private GarageId(String id) {
-            this.id = id;
-        }
-
-        public static GarageId create() {
-            return new GarageId("G" + (1_000_000 + new SecureRandom().nextInt(8_000_000)));
-        }
-
-        @Override
-        public String toString() {
-            return id;
-        }
+    @EventSourcingHandler
+    public void on(ExitConfirmedEvent event) {
+        used = used - 1;
     }
 }

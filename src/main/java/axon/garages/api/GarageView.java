@@ -1,4 +1,4 @@
-package axon.garages.query;
+package axon.garages.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +16,6 @@ public class GarageView implements Comparable<GarageView> {
 
     @Override
     public int compareTo(final GarageView other) {
-        return Double.compare(other.calcFill(), this.calcFill());
+        return Double.compare(this.calcFill(), other.calcFill());
     }
 }

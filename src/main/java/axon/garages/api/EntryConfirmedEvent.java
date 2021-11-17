@@ -1,9 +1,9 @@
-package ch.ergonomics.demo.garages.api;
+package axon.garages.api;
 
 import lombok.Value;
 
 @Value
 public class EntryConfirmedEvent {
-    String gId;
-    String uId;
+    String gid;
+    String uid;
 }

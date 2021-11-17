@@ -1,13 +1,13 @@
-package ch.ergonomics.demo.tickets;
+package axon.tickets;
 
-import ch.ergonomics.demo.cards.Card;
-import ch.ergonomics.demo.cards.api.CardBalanceUpdatedEvent;
-import ch.ergonomics.demo.cards.api.CardIssuedEvent;
-import ch.ergonomics.demo.cards.api.IssueTicketCmd;
-import ch.ergonomics.demo.cards.api.PayTicketCmd;
-import ch.ergonomics.demo.cards.api.TicketIssuedEvent;
-import ch.ergonomics.demo.cards.api.TicketPaidEvent;
-import ch.ergonomics.demo.garages.Garage;
+import axon.cards.command.Card;
+import axon.cards.api.CardBalanceUpdatedEvent;
+import axon.cards.api.CardIssuedEvent;
+import axon.cards.api.IssueTicketCmd;
+import axon.cards.api.PayTicketCmd;
+import axon.cards.api.TicketIssuedEvent;
+import axon.cards.api.TicketPaidEvent;
+import axon.shared.GarageId;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.axonframework.test.matchers.Matchers;
@@ -30,7 +30,7 @@ class TicketTest{
     @Test
     void testIssueTicketsWorks() {
         var uId = Card.CardId.create().toString();
-        var gId = Garage.GarageId.create().toString();
+        var gId = GarageId.create().toString();
         var start = Instant.now();
         fixture
             .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 10.0))
@@ -47,7 +47,7 @@ class TicketTest{
     @Test
     void testIssueTicketsMoreThanOncePublishesNoMoreTicketIssuedEvents() {
         var uId = Card.CardId.create().toString();
-        var gId = Garage.GarageId.create().toString();
+        var gId = GarageId.create().toString();
         var start = Instant.now();
         fixture
             .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 10.0))
@@ -60,7 +60,7 @@ class TicketTest{
     @Test
     void testPayTicketsWorks() {
         var uId = Card.CardId.create().toString();
-        var gId = Garage.GarageId.create().toString();
+        var gId = GarageId.create().toString();
         var start = Instant.now();
         var stop = start.plusSeconds(3600);
         fixture
@@ -80,7 +80,7 @@ class TicketTest{
     @Test
     void testPayTicketsWithNoEnoughCreditFails() {
         var uId = Card.CardId.create().toString();
-        var gId = Garage.GarageId.create().toString();
+        var gId = GarageId.create().toString();
         var start = Instant.now();
         var stop = start.plusSeconds(3600);
         fixture
@@ -93,7 +93,7 @@ class TicketTest{
     @Test
     void testPayingTicketsMoreThanOnceWorksAndUpdatesStopTime() {
         var uId = Card.CardId.create().toString();
-        var gId = Garage.GarageId.create().toString();
+        var gId = GarageId.create().toString();
         var start = Instant.now();
         fixture
             .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 10.0))

@@ -1,4 +1,4 @@
-package axon.tickets;
+package axon.cards.command;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
