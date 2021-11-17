@@ -5,8 +5,8 @@ import lombok.Value;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @Value
-public class InvalidateTicketCmd {
+public class RechargeCardCmd {
     @Getter(onMethod_ = {@TargetAggregateIdentifier()})
-    String uid;
-    String gid;
+    String cardId;
+    double amount;
 }

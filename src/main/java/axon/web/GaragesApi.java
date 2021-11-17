@@ -1,8 +1,8 @@
 package axon.web;
 
-import axon.cards.api.InvalidateTicketCmd;
-import axon.cards.api.IssueTicketCmd;
-import axon.cards.api.PayTicketCmd;
+import axon.cards.api.InvalidatePermitCmd;
+import axon.cards.api.IssuePermitCmd;
+import axon.cards.api.PayOutstandingCmd;
 import axon.garages.api.*;
 import org.axonframework.extensions.reactor.commandhandling.gateway.ReactorCommandGateway;
 import org.axonframework.extensions.reactor.queryhandling.gateway.ReactorQueryGateway;
@@ -26,10 +26,10 @@ public class GaragesApi {
     }
 
     @GetMapping("/garages")
-    public Mono<List<String>> garages() {
+    public Mono<List<GarageView>> garages() {
         return reactorQueryGateway.query(
-            new GarageIdsQuery(),
-            ResponseTypes.multipleInstancesOf(String.class)
+            new AllGaragesQuery(),
+            ResponseTypes.multipleInstancesOf(GarageView.class)
         );
     }
 
@@ -56,21 +56,17 @@ public class GaragesApi {
 
     @PostMapping(path = "/garages/{gid}/confirm-entry/{uid}")
     public Mono<Void> confirmEntry(@PathVariable String gid, @PathVariable String uid) {
-        return reactorCommandGateway.send(new IssueTicketCmd(uid, gid, Instant.now()));
+        return reactorCommandGateway.send(new IssuePermitCmd(uid, gid));
     }
 
     @PostMapping(path = "/garages/{gid}/request-exit/{uid}")
     public Mono<Boolean> requestExit(@PathVariable String gid, @PathVariable String uid) {
-        return
-            reactorCommandGateway
-                .send(new PayTicketCmd(uid, gid, Instant.now()))
-                .map(o -> true)
-                .onErrorReturn(false);
+        return reactorCommandGateway.send(new PayOutstandingCmd(uid, gid));
     }
 
     @PostMapping(path = "/garages/{gid}/confirm-exit/{uid}")
     public Mono<Void> confirmExit(@PathVariable String gid, @PathVariable String uid) {
-        return reactorCommandGateway.send(new InvalidateTicketCmd(uid, gid));
+        return reactorCommandGateway.send(new InvalidatePermitCmd(uid, gid));
     }
 
 }

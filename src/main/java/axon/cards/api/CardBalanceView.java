@@ -3,7 +3,7 @@ package axon.cards.api;
 import lombok.Value;
 
 @Value
-public class CardBalance {
-    String uid;
+public class CardBalanceView {
+    String cardId;
     double balance;
 }

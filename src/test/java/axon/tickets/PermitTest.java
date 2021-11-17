@@ -1,13 +1,13 @@
 package axon.tickets;
 
 import axon.cards.command.Card;
-import axon.cards.api.CardBalanceUpdatedEvent;
+import axon.cards.api.CardRechargedEvent;
 import axon.cards.api.CardIssuedEvent;
-import axon.cards.api.IssueTicketCmd;
-import axon.cards.api.PayTicketCmd;
-import axon.cards.api.TicketIssuedEvent;
-import axon.cards.api.TicketPaidEvent;
-import axon.shared.GarageId;
+import axon.cards.api.IssuePermitCmd;
+import axon.cards.api.PayOutstandingCmd;
+import axon.cards.api.PermitIssuedEvent;
+import axon.cards.api.PaymentEvent;
+import axon.util.GarageId;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.axonframework.test.matchers.Matchers;
@@ -18,7 +18,7 @@ import java.time.Instant;
 import static org.axonframework.test.matchers.Matchers.*;
 import static org.axonframework.test.matchers.Matchers.andNoMore;
 
-class TicketTest{
+class PermitTest {
 
     private FixtureConfiguration<Card> fixture;
 
@@ -30,15 +30,15 @@ class TicketTest{
     @Test
     void testIssueTicketsWorks() {
         var uId = Card.CardId.create().toString();
-        var gId = GarageId.create().toString();
+        var gId = GarageId.generate().toString();
         var start = Instant.now();
         fixture
-            .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 10.0))
-            .when(new IssueTicketCmd(uId, gId, start))
+            .given(new CardIssuedEvent(uId), new CardRechargedEvent(uId, 10.0))
+            .when(new IssuePermitCmd(uId, gId, start))
             .expectSuccessfulHandlerExecution()
             .expectEventsMatching(
                 exactSequenceOf(
-                    messageWithPayload(Matchers.<TicketIssuedEvent>predicate(e -> e.getStart().equals(start) && e.getGid().equals(gId) && e.getUid().equals(uId))),
+                    messageWithPayload(Matchers.<PermitIssuedEvent>predicate(e -> e.getStart().equals(start) && e.getGid().equals(gId) && e.getUid().equals(uId))),
                     andNoMore()
                 )
             );
@@ -47,12 +47,12 @@ class TicketTest{
     @Test
     void testIssueTicketsMoreThanOncePublishesNoMoreTicketIssuedEvents() {
         var uId = Card.CardId.create().toString();
-        var gId = GarageId.create().toString();
+        var gId = GarageId.generate().toString();
         var start = Instant.now();
         fixture
-            .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 10.0))
-            .andGivenCommands(new IssueTicketCmd(uId, gId, start))
-            .when(new IssueTicketCmd(uId, gId, start.plusSeconds(100)))
+            .given(new CardIssuedEvent(uId), new CardRechargedEvent(uId, 10.0))
+            .andGivenCommands(new IssuePermitCmd(uId, gId, start))
+            .when(new IssuePermitCmd(uId, gId, start.plusSeconds(100)))
             .expectSuccessfulHandlerExecution()
             .expectNoEvents();
     }
@@ -60,18 +60,18 @@ class TicketTest{
     @Test
     void testPayTicketsWorks() {
         var uId = Card.CardId.create().toString();
-        var gId = GarageId.create().toString();
+        var gId = GarageId.generate().toString();
         var start = Instant.now();
         var stop = start.plusSeconds(3600);
         fixture
-            .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 10.0))
-            .andGivenCommands(new IssueTicketCmd(uId, gId, start))
-            .when(new PayTicketCmd(uId, gId, stop))
+            .given(new CardIssuedEvent(uId), new CardRechargedEvent(uId, 10.0))
+            .andGivenCommands(new IssuePermitCmd(uId, gId, start))
+            .when(new PayOutstandingCmd(uId, gId, stop))
             .expectSuccessfulHandlerExecution()
             .expectEventsMatching(
                 exactSequenceOf(
-                    messageWithPayload(Matchers.<TicketPaidEvent>predicate(e -> e.getStop().equals(stop) && (int) e.getPrice() == 3)),
-                    messageWithPayload(Matchers.<CardBalanceUpdatedEvent>predicate(e -> (int) e.getBalance() == 7)),
+                    messageWithPayload(Matchers.<PaymentEvent>predicate(e -> e.getStop().equals(stop) && (int) e.getPrice() == 3)),
+                    messageWithPayload(Matchers.<CardRechargedEvent>predicate(e -> (int) e.getAmount() == 7)),
                     andNoMore()
                 )
             );
@@ -80,30 +80,30 @@ class TicketTest{
     @Test
     void testPayTicketsWithNoEnoughCreditFails() {
         var uId = Card.CardId.create().toString();
-        var gId = GarageId.create().toString();
+        var gId = GarageId.generate().toString();
         var start = Instant.now();
         var stop = start.plusSeconds(3600);
         fixture
-            .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 1.0))
-            .andGivenCommands(new IssueTicketCmd(uId, gId, start))
-            .when(new PayTicketCmd(uId, gId, stop))
+            .given(new CardIssuedEvent(uId), new CardRechargedEvent(uId, 1.0))
+            .andGivenCommands(new IssuePermitCmd(uId, gId, start))
+            .when(new PayOutstandingCmd(uId, gId, stop))
             .expectException(IllegalArgumentException.class);
     }
 
     @Test
     void testPayingTicketsMoreThanOnceWorksAndUpdatesStopTime() {
         var uId = Card.CardId.create().toString();
-        var gId = GarageId.create().toString();
+        var gId = GarageId.generate().toString();
         var start = Instant.now();
         fixture
-            .given(new CardIssuedEvent(uId), new CardBalanceUpdatedEvent(uId, 10.0))
-            .andGivenCommands(new IssueTicketCmd(uId, gId, start), new PayTicketCmd(uId, gId, start.plusSeconds(600)))
-            .when(new PayTicketCmd(uId, gId, start.plusSeconds(900)))
+            .given(new CardIssuedEvent(uId), new CardRechargedEvent(uId, 10.0))
+            .andGivenCommands(new IssuePermitCmd(uId, gId, start), new PayOutstandingCmd(uId, gId, start.plusSeconds(600)))
+            .when(new PayOutstandingCmd(uId, gId, start.plusSeconds(900)))
             .expectSuccessfulHandlerExecution()
             .expectEventsMatching(
                 exactSequenceOf(
-                    messageWithPayload(Matchers.<TicketPaidEvent>predicate(e -> e.getStop().equals(start.plusSeconds(900)))),
-                    messageWithPayload(Matchers.<CardBalanceUpdatedEvent>predicate(e -> e.getBalance() == 9.25)),
+                    messageWithPayload(Matchers.<PaymentEvent>predicate(e -> e.getStop().equals(start.plusSeconds(900)))),
+                    messageWithPayload(Matchers.<CardRechargedEvent>predicate(e -> e.getAmount() == 9.25)),
                     andNoMore()
                 )
             );

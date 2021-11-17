@@ -1,7 +1,7 @@
 package axon.garages.command;
 
-import axon.cards.api.TicketInvalidatedEvent;
-import axon.cards.api.TicketIssuedEvent;
+import axon.cards.api.PermitInvalidatedEvent;
+import axon.cards.api.PermitIssuedEvent;
 import axon.garages.api.ConfirmEntryCmd;
 import axon.garages.api.ConfirmExitCmd;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -17,12 +17,12 @@ public class TicketEventsHandler {
     }
 
     @EventHandler
-    void handle(TicketIssuedEvent event) {
-        commandGateway.send(new ConfirmEntryCmd(event.getGid(), event.getUid()));
+    void handle(PermitIssuedEvent event) {
+        commandGateway.send(new ConfirmEntryCmd(event.getPermit().getGarageId()));
     }
 
     @EventHandler
-    void handle(TicketInvalidatedEvent event) {
-        commandGateway.send(new ConfirmExitCmd(event.getGId(), event.getUId()));
+    void handle(PermitInvalidatedEvent event) {
+        commandGateway.send(new ConfirmExitCmd(event.getPermit().getGarageId()));
     }
 }

@@ -5,8 +5,8 @@ import lombok.Value;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @Value
-public class CreditCmd {
+public class PayOutstandingCmd {
     @Getter(onMethod_ = {@TargetAggregateIdentifier()})
-    String uid;
-    double credit;
+    String cardId;
+    String garageId;
 }

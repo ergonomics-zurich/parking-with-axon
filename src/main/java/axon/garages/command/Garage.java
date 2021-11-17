@@ -1,7 +1,7 @@
 package axon.garages.command;
 
 import axon.garages.api.*;
-import axon.shared.GarageId;
+import axon.util.GarageId;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -25,7 +25,7 @@ public class Garage {
         if (cmd.getUsed() > cmd.getCapacity()) throw new IllegalArgumentException("used must be <= capacity");
 
         AggregateLifecycle.apply(
-            new GarageRegisteredEvent(GarageId.create().toString(), cmd.getCapacity(), cmd.getUsed()));
+            new GarageRegisteredEvent(GarageId.generate().toString(), cmd.getCapacity(), cmd.getUsed()));
     }
 
     @CommandHandler
@@ -36,14 +36,12 @@ public class Garage {
 
     @CommandHandler
     public void handle(ConfirmEntryCmd cmd) {
-        AggregateLifecycle
-            .apply(new EntryConfirmedEvent(garageId, cmd.getUid()));
+        AggregateLifecycle.apply(new EntryConfirmedEvent(garageId));
     }
 
     @CommandHandler
     public void handle(ConfirmExitCmd cmd) {
-        AggregateLifecycle
-            .apply(new ExitConfirmedEvent(garageId, cmd.getUid()));
+        AggregateLifecycle.apply(new ExitConfirmedEvent(garageId));
     }
 
     @EventSourcingHandler

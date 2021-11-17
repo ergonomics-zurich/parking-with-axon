@@ -3,6 +3,7 @@ package axon.cards.api;
 import lombok.Value;
 
 @Value
-public class CardBalanceQuery {
+public class CardRechargedEvent {
     String cardId;
+    double amount;
 }

@@ -4,12 +4,9 @@ import lombok.Getter;
 import lombok.Value;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
-import java.time.Instant;
-
 @Value
-public class IssueTicketCmd {
+public class InvalidatePermitCmd {
     @Getter(onMethod_ = {@TargetAggregateIdentifier()})
-    String uid;
-    String gid;
-    Instant start;
+    String cardId;
+    String garageId;
 }

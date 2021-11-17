@@ -8,9 +8,14 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-public class BestGarageProjection {
+public class GarageProjection {
     private final PriorityQueue<GarageView> garages = new PriorityQueue<>(GarageView::compareTo);
-    private final Map<String, GarageView> garageById = new HashMap<>();
+    private final Map<String, GarageView> garageById = new TreeMap<>();
+
+    @QueryHandler
+    public List<GarageView> handle(AllGaragesQuery query) {
+        return List.copyOf(garageById.values());
+    }
 
     @QueryHandler
     public GarageView handle(BestGarageQuery query) {
@@ -26,7 +31,7 @@ public class BestGarageProjection {
 
     @EventHandler
     public void on(EntryConfirmedEvent event) {
-        var garage = garageById.get(event.getGid());
+        var garage = garageById.get(event.getGarageId());
         garages.remove(garage);
         garage.setUsed(garage.getUsed() + 1);
         garages.add(garage);
@@ -34,7 +39,7 @@ public class BestGarageProjection {
 
     @EventHandler
     public void on(ExitConfirmedEvent event) {
-        var garage = garageById.get(event.getGid());
+        var garage = garageById.get(event.getGarageId());
         garages.remove(garage);
         garage.setUsed(garage.getUsed() - 1);
         garages.add(garage);

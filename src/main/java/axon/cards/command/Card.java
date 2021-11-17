@@ -1,139 +1,106 @@
 package axon.cards.command;
 
-import axon.cards.api.CardBalanceUpdatedEvent;
-import axon.cards.api.CardIssuedEvent;
-import axon.cards.api.CreditCmd;
-import axon.cards.api.InvalidateTicketCmd;
-import axon.cards.api.IssueCardCmd;
-import axon.cards.api.IssueTicketCmd;
-import axon.cards.api.PayTicketCmd;
-import axon.cards.api.TicketInvalidatedEvent;
-import axon.cards.api.TicketIssuedEvent;
-import axon.cards.api.TicketPaidEvent;
+import axon.cards.api.*;
+import axon.util.CardId;
+import axon.util.PermitId;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
-import java.security.SecureRandom;
-import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Aggregate
 public class Card {
     @AggregateIdentifier
-    public String uid;
-    private double balance = 0.0;
-    private final Map<String, Ticket> tickets = new HashMap<>();
-
-    @CommandHandler
-    public Card(IssueCardCmd cmd) {
-        var id = CardId.create();
-        AggregateLifecycle
-            .apply(new CardIssuedEvent(id.toString()))
-            .andThenApply(() -> new CardBalanceUpdatedEvent(id.toString(), 0.0));
-    }
+    private String cardId;
+    private double balance;
+    private Set<Permit> permits;
+    private HashMap<String, Double> partialPayments;
 
     protected Card() {
     }
 
-    @CommandHandler
-    public void creditCard(CreditCmd cmd) {
-        if (cmd.getCredit() <= 0)
-            throw new IllegalArgumentException("credit must be > 0");
-        if (this.balance + cmd.getCredit() > 500)
-            throw new IllegalArgumentException("card may hold no more than 500");
-
-        AggregateLifecycle.apply(new CardBalanceUpdatedEvent(this.uid, this.balance + cmd.getCredit()));
+    private Optional<Permit> findByGarage(String garageId) {
+        return this.permits.stream()
+            .filter(permit -> permit.getGarageId().equals(garageId))
+            .findFirst();
     }
 
     @CommandHandler
-    public void issueTicket(IssueTicketCmd cmd) {
-        if (!tickets.containsKey(cmd.getGid())) {
-            AggregateLifecycle.apply(new TicketIssuedEvent(cmd.getUid(), cmd.getGid(), cmd.getStart()));
-        }
+    public Card(IssueCardCmd cmd) {
+        AggregateLifecycle.apply(new CardIssuedEvent(CardId.generate()));
     }
 
     @CommandHandler
-    public void payTicket(PayTicketCmd cmd) {
-        if (!tickets.containsKey(cmd.getGid())) {
-            throw new IllegalArgumentException(String.format("No ticket at garage %s", cmd.getGid()));
-        }
-        var ticket = tickets.get(cmd.getGid());
-        var duration = Duration.between(ticket.getStart(), cmd.getStop()).abs().toMinutes();
-        var price = duration * 0.05;
-        if (price >= ticket.getAmountPaid()) {
-            var toDebit = price - ticket.getAmountPaid();
-            if (toDebit <= 0) {
-                throw new IllegalArgumentException("price must be > 0");
-            }
-            if (this.balance - toDebit < 0) {
-                throw new IllegalArgumentException("card may not go negative");
-            }
-            AggregateLifecycle
-                .apply(new TicketPaidEvent(cmd.getGid(), cmd.getStop(), price))
-                .andThenApply(() -> new CardBalanceUpdatedEvent(this.uid, this.balance - toDebit));
+    public void handle(RechargeCardCmd cmd) {
+        if (cmd.getAmount() <= 0) throw new IllegalArgumentException("credit must be > 0");
+        if (this.balance + cmd.getAmount() > 500) throw new IllegalArgumentException("card may not hold > 500");
+
+        AggregateLifecycle.apply(new CardRechargedEvent(this.cardId, cmd.getAmount()));
+    }
+
+    @CommandHandler
+    public void handle(IssuePermitCmd cmd) {
+        if (findByGarage(cmd.getGarageId()).isPresent()) throw new IllegalArgumentException("card already used here");
+
+        var permit = new Permit(PermitId.generate(), cmd.getCardId(), cmd.getGarageId(), Instant.now());
+        AggregateLifecycle.apply(new PermitIssuedEvent(permit));
+    }
+
+    @CommandHandler
+    public boolean handle(PayOutstandingCmd cmd) {
+        var permit = this.findByGarage(cmd.getGarageId())
+            .orElseThrow(() -> new IllegalArgumentException("card not parking here"));
+        var price = permit.calcPrice() - this.partialPayments.getOrDefault(permit.getPermitId(), 0.0);
+        if (price <= this.balance) {
+            AggregateLifecycle.apply(
+                new PaymentEvent(this.cardId, permit.getPermitId(), Instant.now(), price));
+            return true;
         } else {
-            AggregateLifecycle.apply(new TicketPaidEvent(cmd.getGid(), cmd.getStop(), price));
+            return false;
         }
-
     }
 
     @CommandHandler
-    public void invalidateTicket(InvalidateTicketCmd cmd) {
-        AggregateLifecycle.apply(new TicketInvalidatedEvent(cmd.getGid(), cmd.getUid()));
+    public void handle(InvalidatePermitCmd cmd) {
+        var permit = this.findByGarage(cmd.getGarageId())
+            .orElseThrow(() -> new IllegalArgumentException("card not parking here"));
+        AggregateLifecycle.apply(new PermitInvalidatedEvent(permit, Instant.now()));
     }
 
     @EventSourcingHandler
     public void on(CardIssuedEvent event) {
-        this.uid = event.getUid();
+        this.cardId = event.getCardId();
+        this.balance = 0.0;
+        this.permits = new HashSet<>();
+        this.partialPayments = new HashMap<>();
     }
 
     @EventSourcingHandler
-    public void on(CardBalanceUpdatedEvent event) {
-        this.balance = event.getBalance();
+    public void on(CardRechargedEvent event) {
+        this.balance += event.getAmount();
     }
 
     @EventSourcingHandler
-    public void on(TicketIssuedEvent event) {
-        tickets.put(event.getGid(), Ticket.create(event.getGid(), event.getUid(), event.getStart()));
+    public void on(PermitIssuedEvent event) {
+        this.permits.add(event.getPermit());
     }
 
     @EventSourcingHandler
-    public void on(TicketPaidEvent event) {
-        var ticket = tickets.get(event.getGId());
-        ticket.setStop(event.getStop());
-        ticket.setAmountPaid(event.getPrice());
+    public void on(PaymentEvent event) {
+        var amountPaid = this.partialPayments.getOrDefault(event.getPermitId(), 0.0) + event.getAmount();
+        this.partialPayments.put(event.getPermitId(), amountPaid);
     }
 
     @EventSourcingHandler
-    public void on(TicketInvalidatedEvent event) {
-        tickets.remove(event.getGId());
+    public void on(PermitInvalidatedEvent event) {
+        this.partialPayments.remove(event.getPermit().getPermitId());
+        this.permits.remove(event.getPermit());
     }
-
-    public static class CardId {
-
-        private final String id;
-
-        private CardId(final String id) {
-            this.id = id;
-        }
-
-        public static CardId create() {
-            var rnd = new SecureRandom();
-            var sb = new StringBuilder();
-            while (sb.length() < 14) {
-                sb.append(Integer.toHexString(rnd.nextInt(16)));
-            }
-            return new CardId(sb.toString());
-        }
-
-        @Override
-        public String toString() {
-            return id;
-        }
-    }
-
 }

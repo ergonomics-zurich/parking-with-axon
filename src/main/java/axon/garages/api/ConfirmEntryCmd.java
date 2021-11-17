@@ -7,6 +7,5 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 @Value
 public class ConfirmEntryCmd {
     @Getter(onMethod_ = {@TargetAggregateIdentifier()})
-    String gid;
-    String uid;
+    String garageId;
 }

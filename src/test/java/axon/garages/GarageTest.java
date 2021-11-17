@@ -9,7 +9,7 @@ import axon.garages.api.ExitConfirmedEvent;
 import axon.garages.api.GarageRegisteredEvent;
 import axon.garages.api.RegisterGarageCmd;
 import axon.garages.command.Garage;
-import axon.shared.GarageId;
+import axon.util.GarageId;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.axonframework.test.matchers.Matchers;
@@ -53,7 +53,7 @@ class GarageTest {
 
     @Test
     void testParkingAllowedWhenFreeSlotsAreAvailable() {
-        var gId = GarageId.create().toString();
+        var gId = GarageId.generate().toString();
         var uId = Card.CardId.create().toString();
         fixture
             .given(new GarageRegisteredEvent(gId, 6))
@@ -69,7 +69,7 @@ class GarageTest {
 
     @Test
     void testNoParkingAllowedWhenNoFreeSlots() {
-        var gId = GarageId.create().toString();
+        var gId = GarageId.generate().toString();
         var uId = Card.CardId.create().toString();
         fixture
             .given(new GarageRegisteredEvent(gId, 0))
@@ -79,7 +79,7 @@ class GarageTest {
 
     @Test
     void testConfirmingEntryDecreasesCapacity() {
-        var gId = GarageId.create().toString();
+        var gId = GarageId.generate().toString();
         var uId = Card.CardId.create().toString();
         fixture
             .given(new GarageRegisteredEvent(gId, 5))
@@ -87,7 +87,7 @@ class GarageTest {
             .expectEventsMatching(
                 exactSequenceOf(
                     messageWithPayload(Matchers.<CapacityUpdatedEvent>predicate(e -> e.getUsed() == 4)),
-                    messageWithPayload(Matchers.<EntryConfirmedEvent>predicate(e -> e.getGid().equals(gId) && e.getUid().equals(uId))),
+                    messageWithPayload(Matchers.<EntryConfirmedEvent>predicate(e -> e.getGarageId().equals(gId) && e.getUid().equals(uId))),
                     andNoMore()
                 )
             );
@@ -95,7 +95,7 @@ class GarageTest {
 
     @Test
     void testConfirmingExitIncreasesCapacity() {
-        var gId = GarageId.create().toString();
+        var gId = GarageId.generate().toString();
         var uId = Card.CardId.create().toString();
         fixture
             .given(new GarageRegisteredEvent(gId, 5))
@@ -103,7 +103,7 @@ class GarageTest {
             .expectEventsMatching(
                 exactSequenceOf(
                     messageWithPayload(Matchers.<CapacityUpdatedEvent>predicate(e -> e.getUsed() == 6)),
-                    messageWithPayload(Matchers.<ExitConfirmedEvent>predicate(e -> e.getGid().equals(gId))),
+                    messageWithPayload(Matchers.<ExitConfirmedEvent>predicate(e -> e.getGarageId().equals(gId))),
                     andNoMore()
                 )
             );

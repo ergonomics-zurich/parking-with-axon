@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -24,10 +25,10 @@ public class CardsApi {
     ReactorQueryGateway reactorQueryGateway;
 
     @GetMapping("/cards")
-    public Mono<List<String>> cards() {
+    public Mono<List<CardBalanceView>> cards() {
         return reactorQueryGateway.query(
-                new CardIdsQuery("0", "f"),
-                ResponseTypes.multipleInstancesOf(String.class)
+                new AllCardsQuery(),
+                ResponseTypes.multipleInstancesOf(CardBalanceView.class)
         );
     }
 
@@ -37,17 +38,15 @@ public class CardsApi {
     }
 
     @GetMapping(path = "/cards/{uid}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Mono<SubscriptionQueryResult<CardBalance, CardBalance>> cardBalance(@PathVariable String uid) {
+    public Flux<CardBalanceView> cardBalance(@PathVariable String uid) {
         return reactorQueryGateway.subscriptionQuery(
-                new CardBalanceQuery(uid),
-                ResponseTypes.instanceOf(CardBalance.class),
-                ResponseTypes.instanceOf(CardBalance.class)
+            new CardBalanceQuery(uid),
+            ResponseTypes.instanceOf(CardBalanceView.class)
         );
     }
 
     @PostMapping(path = "/cards/{uid}/credit/{amount}")
     public Mono<Void> credit(@PathVariable String uid, @PathVariable double amount) {
-        return reactorCommandGateway.send(new CreditCmd(uid, amount));
+        return reactorCommandGateway.send(new RechargeCardCmd(uid, amount));
     }
-
 }
