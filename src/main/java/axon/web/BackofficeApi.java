@@ -9,16 +9,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 public class BackofficeApi {
-    @Autowired
-    QueryGateway queryGateway;
+
+    final QueryGateway queryGateway;
+
+    public BackofficeApi(QueryGateway queryGateway) {
+        this.queryGateway = queryGateway;
+    }
 
     @GetMapping("/backoffice/active-permits")
-    public List<PermitView> activePermits() {
-        return queryGateway
-            .query(new ActivePermitsQuery(), ResponseTypes.multipleInstancesOf(PermitView.class))
-            .join();
+    public CompletableFuture<List<PermitView>> activePermits() {
+        return queryGateway.query(new ActivePermitsQuery(), ResponseTypes.multipleInstancesOf(PermitView.class));
     }
 }

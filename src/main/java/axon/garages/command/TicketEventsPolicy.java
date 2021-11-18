@@ -5,14 +5,16 @@ import axon.cards.api.PermitIssuedEvent;
 import axon.garages.api.ConfirmEntryCmd;
 import axon.garages.api.ConfirmExitCmd;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TicketEventsHandler {
+@ProcessingGroup("ticket-events-policy")
+public class TicketEventsPolicy {
     private final CommandGateway commandGateway;
 
-    public TicketEventsHandler(CommandGateway commandGateway) {
+    public TicketEventsPolicy(CommandGateway commandGateway) {
         this.commandGateway = commandGateway;
     }
 

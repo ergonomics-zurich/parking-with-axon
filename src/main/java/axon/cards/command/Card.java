@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-@Aggregate
+@Aggregate(snapshotTriggerDefinition = "cardSnapshotTrigger")
 public class Card {
     @AggregateIdentifier
     private String cardId;
