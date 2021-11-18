@@ -87,7 +87,7 @@ curl -X POST http://localhost:8080/garages/{gid}/confirm-exit/{uid}
 
 ```shell
 # list permits that are currently active in garages
-GET /backoffice/active-permits
+curl -X GET http://localhost:8080/backoffice/active-permits
 ```
 
 ### Generate Load
