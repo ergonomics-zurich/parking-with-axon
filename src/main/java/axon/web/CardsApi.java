@@ -17,11 +17,15 @@ import java.util.List;
 
 @RestController
 public class CardsApi {
-    @Autowired
-    ReactorCommandGateway reactorCommandGateway;
 
-    @Autowired
-    ReactorQueryGateway reactorQueryGateway;
+    final ReactorCommandGateway reactorCommandGateway;
+
+    final ReactorQueryGateway reactorQueryGateway;
+
+    public CardsApi(ReactorCommandGateway reactorCommandGateway, ReactorQueryGateway reactorQueryGateway) {
+        this.reactorCommandGateway = reactorCommandGateway;
+        this.reactorQueryGateway = reactorQueryGateway;
+    }
 
     @GetMapping("/cards")
     public Mono<List<CardBalanceView>> cards() {
