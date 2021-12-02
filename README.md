@@ -3,9 +3,12 @@
 A parking backend implemented using
 [Axon Framework](https://axoniq.io/product-overview/axon-framework)
 and [Axon Server](https://axoniq.io/product-overview/axon-server)
-as part of [this meetup](https://www.meetup.com/Domain-Driven-Design-Switzerland/events/281690302/).
+as part of [this meetup](https://www.meetup.com/Domain-Driven-Design-Switzerland/events/281690302/)
+by [Ergonomics AG](https://www.ergonomics.ch/).
 
-Feel free to contact us to discuss your event-driven needs.
+Feel free to contact us to discuss your event-driven needs [here](mailto:axon.consulting@ergonomics.ch)
+
+## Parking with Axon
 
 The application currently covers functionality from three contexts:
 
