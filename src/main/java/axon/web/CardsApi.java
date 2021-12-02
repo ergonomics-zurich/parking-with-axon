@@ -9,6 +9,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+/* Parking with Axon Demo App
+ * This is part of Ergonomics AG's code example for the Axon Framework Workshop Nov 21.
+ * Feel free to contact us to discuss your event-driven needs at axon.consulting@ergonomics.ch.
+ */
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

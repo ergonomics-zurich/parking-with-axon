@@ -5,6 +5,8 @@ A parking backend implemented using
 and [Axon Server](https://axoniq.io/product-overview/axon-server)
 as part of [this meetup](https://www.meetup.com/Domain-Driven-Design-Switzerland/events/281690302/).
 
+Feel free to contact us to discuss your event-driven needs.
+
 The application currently covers functionality from three contexts:
 
 ### Garage Capacity Management
