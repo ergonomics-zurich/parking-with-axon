@@ -1,10 +1,16 @@
+/*
+ * Parking with Axon Demo App
+ *
+ * This is part of Ergonomics's code example for the Axon Framework Workshop Nov 21.
+ * Ergonomics AG can be found at: https://ergonomics.ch/
+ * Feel free to contact us to discuss your event-driven needs at axon.consulting@ergonomics.ch.
+ */
 package axon.web;
 
 import axon.cards.api.*;
 import org.axonframework.extensions.reactor.commandhandling.gateway.ReactorCommandGateway;
 import org.axonframework.extensions.reactor.queryhandling.gateway.ReactorQueryGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
